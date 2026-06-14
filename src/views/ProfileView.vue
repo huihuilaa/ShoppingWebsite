@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useShopStore } from '../store/shop';
+
+const store = useShopStore();
+const activeTab = ref<'orders' | 'info'>('orders');
+const expandedOrderId = ref<string | null>(null);
+
+const toggleOrder = (id: string) => {
+  expandedOrderId.value = expandedOrderId.value === id ? null : id;
+};
+</script>
+
+<template>
+  <div class="container main-content">
+    <div class="section-title" style="margin-bottom: 20px;">
+      <span class="blue-sq">■</span> 會員中心
+    </div>
+
+    <div class="tab-header">
+      <button class="tab-btn" :class="{ active: activeTab === 'orders' }" @click="activeTab = 'orders'">訂單資訊</button>
+      <button class="tab-btn" :class="{ active: activeTab === 'info' }" @click="activeTab = 'info'">個人資料</button>
+    </div>
+
+    <div v-if="activeTab === 'orders'" class="tab-content">
+      <div v-for="order in store.orders" :key="order.id" class="order-block">
+        <div class="order-row-header" @click="toggleOrder(order.id)">
+          <div class="cell">訂單編號 #{{ order.id }}</div>
+          <div class="cell blue-text font-bold">{{ order.status }}</div>
+          <div class="cell">總額：<span class="pink-text font-bold">NT${{ order.totalPrice }}</span></div>
+          <div class="cell right-align">
+            <button class="detail-toggle-btn" @click.stop="toggleOrder(order.id)">訂單明細</button>
+          </div>
+        </div>
+        
+        <div v-if="expandedOrderId === order.id" class="order-expanded-details">
+          <div v-for="item in order.items" :key="item.title" class="expanded-item-row">
+            <div class="exp-name">{{ item.title }} <small>({{ item.spec }})</small></div>
+            <div class="exp-qty">數量：{{ item.quantity }}</div>
+            <div class="exp-price">NT${{ item.price }}</div>
+            <div class="exp-subtotal pink-text">NT${{ item.price * item.quantity }}</div>
+          </div>
+          <div v-if="order.items.length === 0" class="empty-hint">無明細資料</div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="activeTab === 'info'" class="tab-content info-form-wrapper">
+      <div class="form-grid">
+        <div class="form-row"><label>姓名</label><input type="text" value="田中工作人員"></div>
+        <div class="form-row"><label>電子信箱</label><input type="email" value="himehina@example.com" disabled></div>
+        <div class="form-row"><label>電話</label><input type="text" value="0912345678"></div>
+        <div class="form-row"><label>預設地址</label><input type="text" value="高雄市大社區田中路 88 號"></div>
+      </div>
+      <div style="text-align: right; margin-top: 20px;">
+        <button class="pink-btn-rect text-bold" style="width: 100px;">儲存</button>
+      </div>
+    </div>
+  </div>
+</template>

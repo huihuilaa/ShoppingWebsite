@@ -1,0 +1,621 @@
+:root {
+  --accent-color: #ff6b9d;
+  --accent-hover: #e05385;
+  --text-main: #333333;
+  --text-muted: #888888;
+  --border-light: #cccccc;
+  --nav-bg: #f5f7fa;
+  --blue-badge: #5ba4e5;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #ffffff;
+  color: var(--text-main);
+  font-family: Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.main-content {
+  margin-top: 20px;
+  min-height: 70vh;
+}
+
+.line-divider {
+  border: 0;
+  border-top: 1px solid var(--border-light);
+  margin: 30px 0;
+}
+
+/* 頂部導覽列 */
+.navbar {
+  background: var(--nav-bg);
+  border-bottom: 1px solid #e5e8ec;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+
+.nav-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.logo-text {
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.search-bar input {
+  width: 280px;
+  padding: 6px 12px;
+  border: 1px solid #ccd1d9;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.cart-icon-btn {
+  position: relative;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: var(--accent-color);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  line-height: 1;
+}
+
+/* 商品網格與卡片佈局 */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.product-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.img-wrap {
+  aspect-ratio: 1 / 1;
+  border: 1px solid #f0f0f0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.p-info {
+  padding: 10px 0;
+}
+
+.p-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #333;
+}
+
+.p-price {
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+/* 首頁商品過濾功能列（已修正兩端對齊與寬度） */
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 30px 0 15px 0;
+  padding: 0 4px;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.section-title .en {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+.sort-select {
+  padding: 4px 10px;
+  border: 1px solid var(--border-light);
+  background-color: #ffffff;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+  outline: none;
+}
+
+/* 分頁器 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 40px 0;
+}
+
+.page-btn {
+  border: none;
+  background: #e0e0e0;
+  width: 34px;
+  height: 34px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: var(--accent-color);
+  color: white;
+}
+
+.pagination .dots {
+  color: var(--text-muted);
+  line-height: 34px;
+}
+
+/* 商品詳情頁 */
+.detail-top-layout {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.detail-left-img {
+  width: 45%;
+  border: 1px solid #f0f0f0;
+}
+
+.detail-left-img img {
+  width: 100%;
+  height: auto;
+}
+
+.detail-right-meta {
+  width: 55%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.detail-price {
+  color: var(--accent-color);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.meta-row label {
+  width: 60px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.spec-dropdown {
+  padding: 6px;
+  border: 1px solid var(--border-light);
+  width: 180px;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.qty-box {
+  display: flex;
+  border: 1px solid var(--border-light);
+}
+
+.qty-box button {
+  padding: 4px 12px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+}
+
+.qty-box input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  outline: none;
+}
+
+.detail-bottom-info {
+  margin-top: 4px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 20px;
+}
+
+.info-header {
+  font-size: 1rem;
+  margin-bottom: 15px;
+}
+
+.info-content {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #444;
+}
+
+.info-line {
+  margin-bottom: 8px;
+}
+
+/* 購物車頁面左右分欄 */
+.cart-split-layout {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.cart-left-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cart-item-row {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #eee;
+  justify-content: space-between;
+}
+
+.cart-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.cart-item-name {
+  flex: 2;
+  margin-left: 15px;
+  font-size: 0.9rem;
+}
+
+.cart-item-price {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.cart-item-qty {
+  flex: 1;
+}
+
+.cart-qty-input {
+  width: 60px;
+  padding: 4px;
+  border: 1px solid var(--border-light);
+  text-align: center;
+}
+
+.cart-item-action {
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.cart-item-action:hover {
+  color: var(--accent-color);
+}
+
+.cart-right-summary {
+  width: 280px;
+}
+
+.summary-box {
+  border: 1px solid var(--border-light);
+  padding: 20px;
+  background: #fff;
+}
+
+.summary-title {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  font-size: 1rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+
+.total-row {
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+  font-size: 1.1rem;
+}
+
+.checkout-btn {
+  width: 100%;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.checkout-btn:hover {
+  background: var(--accent-hover);
+}
+
+/* 會員中心頁籤與訂單區塊 */
+.tab-header {
+  display: flex;
+  gap: 10px;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.tab-btn.active {
+  border-bottom: 2px solid var(--accent-color);
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.order-block {
+  border: 1px solid #eee;
+  margin-bottom: 15px;
+  background: #fff;
+}
+
+.order-row-header {
+  display: flex;
+  padding: 15px;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.order-row-header .cell {
+  font-size: 0.9rem;
+}
+
+.detail-toggle-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--border-light);
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.order-expanded-details {
+  background: #fafafa;
+  padding: 15px;
+  border-top: 1px dashed #ddd;
+}
+
+.expanded-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.9rem;
+}
+
+/* 個人資料表單 Layout */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 500px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+}
+
+.form-row label {
+  width: 100px;
+  font-size: 0.9rem;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border-light);
+  outline: none;
+}
+
+.form-row input:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+/* 登入註冊完全置中區塊 */
+.auth-screen-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.auth-card {
+  width: 360px;
+  padding: 30px;
+  border: 1px solid var(--border-light);
+  background: #fff;
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+}
+
+.auth-field {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.auth-field label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+}
+
+.auth-field input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-light);
+  outline: none;
+}
+
+.auth-switch-link {
+  margin-top: 15px;
+  font-size: 0.85rem;
+}
+
+.auth-switch-link a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.auth-switch-link a:hover {
+  color: var(--accent-color);
+}
+
+/* 通用原子類零件 (Atomic Class) */
+.pink-btn-rect {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  outline: none;
+}
+
+.pink-btn-rect:hover {
+  background: var(--accent-hover);
+}
+
+.pink-btn-rect.inverse {
+  background: #fff;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  margin-left: 10px;
+}
+
+.pink-btn-rect.inverse:hover {
+  background: #fff0f5;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.pink-text {
+  color: var(--accent-color);
+}
+
+.blue-text {
+  color: var(--blue-badge);
+}
+
+.blue-sq {
+  color: var(--blue-badge);
+  margin-right: 6px;
+}
+
+/* 頁尾 */
+.footer {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 50px;
+  background: var(--nav-bg);
+  border-top: 1px solid #e5e8ec;
+}
