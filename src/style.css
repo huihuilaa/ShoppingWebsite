@@ -270,6 +270,7 @@ body {
 .qty-box {
   display: flex;
   border: 1px solid var(--border-light);
+  width: fit-content;
 }
 
 .qty-box button {
@@ -277,13 +278,25 @@ body {
   border: none;
   background: #eee;
   cursor: pointer;
+  font-size: 1rem;
+  outline: none;
+}
+
+.qty-box button:hover {
+  background: #e0e0e0;
 }
 
 .qty-box input {
-  width: 40px;
+  width: 50px;
   text-align: center;
   border: none;
   outline: none;
+  font-size: 0.95rem;
+}
+
+.qty-box input::-webkit-outer-spin-button, .qty-box input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .detail-bottom-info {

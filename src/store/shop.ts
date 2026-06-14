@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Product, CartItem, Order } from '../types';
-import { initialProducts } from './data/products';
+import initialProducts from '../data/products.json';
 
 export const useShopStore = defineStore('shop', () => {
-  // 1. 全域狀態 (State) - 初始化時直接採用 products.ts 的資料
-  const products = ref<Product[]>(initialProducts);
+  const products = ref<Product[]>(initialProducts as Product[]);
   const cartItems = ref<CartItem[]>([]);
   
   const orders = ref<Order[]>([
@@ -16,7 +15,6 @@ export const useShopStore = defineStore('shop', () => {
 
   const shippingFee = ref(150);
 
-  // 2. 計算屬性 (Getters)
   const publishedProducts = computed(() => products.value.filter(p => p.status === 'published'));
   const featuredProducts = computed(() => publishedProducts.value.filter(p => p.isFeatured));
   
@@ -34,7 +32,6 @@ export const useShopStore = defineStore('shop', () => {
     return cartItems.value.reduce((sum, item) => sum + item.quantity, 0);
   });
 
-  // 3. 業務邏輯方法 (Actions)
   const addToCart = (product: Product, spec: string, quantity: number) => {
     const existingItem = cartItems.value.find(
       item => item.product.id === product.id && item.selectedSpec === spec

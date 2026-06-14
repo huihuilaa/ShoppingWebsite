@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useShopStore } from './store/shop';
 import HomeView from './views/HomeView.vue';
 import ProductDetailView from './views/ProductDetailView.vue';
 import CartView from './views/CartView.vue';
 import ProfileView from './views/ProfileView.vue';
 
-const store = useShopStore();
 const currentView = ref('home');
 const selectedProductId = ref('');
 
@@ -18,19 +16,36 @@ const navigate = (view: string, id: string = '') => {
 </script>
 
 <template>
-  <header class="navbar">
+  <nav class="navbar">
     <div class="nav-container">
-      <div class="logo" @click="navigate('home')"><span class="logo-text">田中工務店</span></div>
-      <div class="search-bar"><input type="text" placeholder="搜尋商品..."></div>
-      <nav class="nav-links">
-        <a href="#" @click.prevent="navigate('home')">商品</a>
-        <a href="#" @click.prevent="navigate('profile')">會員中心</a>
-        <a href="#" class="cart-icon-btn" @click.prevent="navigate('cart')">
-          🛒 <span v-if="store.totalCartQuantity > 0" class="cart-badge">{{ store.totalCartQuantity }}</span>
+      <div class="nav-left" @click="navigate('home')">
+        <img src="/images/logo.png" alt="Logo" class="nav-logo">
+      </div>
+      
+      <div class="nav-center">
+        <input 
+          v-if="currentView === 'home' || currentView === 'detail'" 
+          type="text" 
+          class="nav-search-input"
+        >
+      </div>
+      
+      <div class="nav-right">
+        <a href="#" class="nav-link" @click.prevent="navigate('home')">商品</a>
+        <a href="#" class="nav-link user-link" @click.prevent="navigate('profile')">
+          <svg class="icon-user" viewBox="0 0 24 24" width="18" height="18">
+            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+          </svg>
+          會員中心
         </a>
-      </nav>
+        <button class="nav-cart-btn" @click="navigate('cart')">
+          <svg class="icon-cart" viewBox="0 0 24 24" width="20" height="20">
+            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm10 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-16-18h3l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+        </button>
+      </div>
     </div>
-  </header>
+  </nav>
 
   <main>
     <HomeView v-if="currentView === 'home'" @navigate="navigate" />

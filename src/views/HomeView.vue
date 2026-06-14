@@ -20,39 +20,55 @@ const sortedProducts = computed(() => {
 
 <template>
   <div class="container">
+    <div class="custom-divider top-line">
+      <div class="thick-black-line"></div>
+      <div class="thin-gray-line"></div>
+    </div>
+
     <section class="featured-section">
       <div class="grid grid-3">
         <div v-for="p in store.featuredProducts" :key="p.id" class="product-card" @click="emit('navigate', 'detail', p.id)">
           <div class="img-wrap"><img :src="p.imageUrl" loading="lazy"></div>
           <div class="p-info">
-            <div class="p-title">{{ p.title }} {{ p.alias }}</div>
+            <div class="p-title pre-line">{{ p.title }} {{ p.alias }}</div>
           </div>
         </div>
       </div>
     </section>
 
-    <hr class="line-divider">
+    <div class="custom-divider">
+      <div class="thick-black-line"></div>
+      <div class="thin-gray-line"></div>
+    </div>
 
     <div class="filter-bar">
       <div class="section-title"><span class="blue-sq">■</span> 所有商品 <span class="en">ALL PRODUCTS</span></div>
-      <select v-model="sortBy" class="sort-select">
-        <option value="latest">最新上架</option>
-        <option value="price-low">價格：低到高</option>
-        <option value="price-high">價格：高到低</option>
-      </select>
+      <div class="select-wrapper">
+        <select v-model="sortBy" class="sort-select">
+          <option value="latest">最新上架 &nbsp;v</option>
+          <option value="price-low">價格：低到高 &nbsp;v</option>
+          <option value="price-high">價格：高到低 &nbsp;v</option>
+        </select>
+      </div>
     </div>
 
     <section class="products-section">
       <div class="grid grid-4">
         <div v-for="p in sortedProducts" :key="p.id" class="product-card" @click="emit('navigate', 'detail', p.id)">
           <div class="img-wrap"><img :src="p.imageUrl" loading="lazy"></div>
-          <div class="p-info">
-            <div class="p-title">{{ p.title }} {{ p.alias }}</div>
-            <div class="p-price">NT${{ p.price }}</div>
-          </div>
+            <div class="p-info">
+              <div class="p-title">{{ p.title }}</div>
+              <div class="p-alias" v-if="p.alias">{{ p.alias }}</div>
+              <div class="p-price">NT${{ p.price }}</div>
+            </div>
         </div>
       </div>
     </section>
+
+    <div class="custom-divider bottom-line">
+      <div class="thick-black-line"></div>
+      <div class="thin-gray-line"></div>
+    </div>
 
     <div class="pagination">
       <button class="page-btn" :class="{ active: currentPage === 1 }" @click="currentPage = 1">1</button>

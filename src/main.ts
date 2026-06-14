@@ -1,10 +1,10 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia' // 1. 引入 createPinia
-import App from './App.vue'
-import './style.css'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import App from './App.vue';
+import './assets/style.css';
 
-const app = createApp(App)
-const pinia = createPinia() // 2. 建立 pinia 實例
+const app = createApp(App);
+const pinia = createPinia();
 
-app.use(pinia) // 3. 這一行一定要在 app.mount('#app') 之前呼叫！
-app.mount('#app')
+app.use(pinia);
+app.mount('#app');

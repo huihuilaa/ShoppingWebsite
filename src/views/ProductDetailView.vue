@@ -35,11 +35,11 @@
     <div class="detail-bottom-info" v-if="product.releaseDate">
       <h3 class="info-header">■ 商品資訊 PRODUCT INFO</h3>
       <div class="info-content">
-        <div class="info-line"><strong>發售狀態：</strong>{{ product.releaseDate }}</div>
-        <div class="info-line"><strong>預購日期：</strong>{{ product.bookingPeriod }}</div>
+        <div class="info-line" style="white-space: pre-line;"><strong>發售狀態：</strong>{{ product.releaseDate }}</div>
+        <div class="info-line" style="white-space: pre-line;"><strong>預購日期：</strong>{{ product.bookingPeriod }}</div>
         <div class="info-line" style="white-space: pre-line;"><strong>商品配送：</strong>{{ product.shippingDate }}</div>
-        <div class="info-line"><strong>商品內容：</strong>{{ product.contentDesc }}</div>
-        <div class="info-line"><strong>商品規格：</strong>{{ product.sizeMaterial }}</div>
+        <div class="info-line" style="white-space: pre-line;"><strong>商品內容：</strong>{{ product.contentDesc }}</div>
+        <div class="info-line" style="white-space: pre-line;"><strong>商品規格：</strong>{{ product.sizeMaterial }}</div>
       </div>
     </div>
   </div>
