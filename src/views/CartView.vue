@@ -4,11 +4,22 @@ import { useShopStore } from '../store/shop';
 const emit = defineEmits(['navigate']);
 const store = useShopStore();
 
+const shouldShowAlias = (title: string) => {
+  return /ver\./i.test(title);
+};
+
 const handleCheckout = () => {
   if (store.cartSubtotal === 0) {
     alert('請至少勾選一項商品進行結帳！');
     return;
   }
+  
+  if (!store.isLoggedIn) {
+    alert('請先登入會員再進行結帳！');
+    emit('navigate', 'login');
+    return;
+  }
+  
   emit('navigate', 'profile');
 };
 </script>
@@ -23,7 +34,11 @@ const handleCheckout = () => {
       <div class="cart-left-list">
         <div v-for="item in store.cartItems" :key="item.id" class="cart-item-row">
           <input type="checkbox" v-model="item.checked" class="cart-checkbox">
-          <div class="cart-item-name">{{ item.product.title }} {{ item.product.alias }} <small>({{ item.selectedSpec }})</small></div>
+          <div class="cart-item-name">
+            {{ item.product.title }}
+            <span v-if="item.product.alias && shouldShowAlias(item.product.title)"> {{ item.product.alias }}</span>
+            <small>({{ item.selectedSpec }})</small>
+          </div>
           <div class="cart-item-price">NT${{ item.product.price }}</div>
           <div class="cart-item-qty">
             <input type="number" v-model.number="item.quantity" min="1" class="cart-qty-input">

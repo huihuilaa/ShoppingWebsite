@@ -12,7 +12,7 @@
     "bookingPeriod": "2026年4月24日 (五) 起開放預購", 
     "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n*依據下單與付款時間不同，到貨時間亦可能有所落差\n*受國際情勢與配送狀況影響，發售與到貨時期皆有變更之可能", 
     "contentDesc": "HIMEHINA 迷你絨毛娃娃 ver.ひめ × 1", 
-    "sizeMaterial": "\n・全長：約 120mm\n\n【材質】\n・棉\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更" 
+    "sizeMaterial": "全長：約 120mm\n\n【材質】\n・棉\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更" 
   },
   { 
     "id": "p2", 
@@ -27,7 +27,7 @@
     "bookingPeriod": "2026年4月24日 (五) 起開放預購", 
     "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送", 
     "contentDesc": "HIMEHINA 迷你絨毛娃娃 ver.ひな × 1", 
-    "sizeMaterial": "\n・全長：約 120mm\n・材質：棉"
+    "sizeMaterial": "全長：約 120mm\n・材質：棉"
   },
   { 
     "id": "p3", 
@@ -42,7 +42,7 @@
     "bookingPeriod": "2026年4月24日 (五) 起開放預購", 
     "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送", 
     "contentDesc": "HIMEHINA 迷你絨毛娃娃 ver.ジョジうさ × 1", 
-    "sizeMaterial": "\n・全長：約 120mm\n・材質：棉"
+    "sizeMaterial": "全長：約 120mm\n・材質：棉"
   },
   { 
     "id": "p4", 
@@ -56,7 +56,7 @@
     "bookingPeriod": "預計於 2026年6月初旬 左右發售",
     "shippingDate": "依點單順序陸續出貨\n* 受國際情勢影響，發售與配送預定時期皆有變更之可能。\n* 依據下單時間不同，到貨時間亦可能有所落差。",
     "contentDesc": "「夏だ！泡だ！パブサマー！」主題設計短 T × 1",
-    "sizeMaterial": "\n・M：衣長 69cm / 胸寬 52cm / 肩寬 46cm / 袖長 20cm\n・L：衣長 73cm / 胸寬 55cm / 肩寬 50cm / 袖長 22cm\n・XL：衣長 77cm / 胸寬 58cm / 肩寬 54cm / 袖長 24cm\n\n【材質】\n・棉 100%"
+    "sizeMaterial": "M：衣長 69cm / 胸寬 52cm / 肩寬 46cm / 袖長 20cm\n・L：衣長 73cm / 胸寬 55cm / 肩寬 50cm / 袖長 22cm\n・XL：衣長 77cm / 胸寬 58cm / 肩寬 54cm / 袖長 24cm\n\n【材質】\n・棉 100%"
   },
   { 
     "id": "p5", 
@@ -70,21 +70,21 @@
     "bookingPeriod": "預計於 2026年6月初旬 左右發售",
     "shippingDate": "依點單順序陸續出貨\n*受國際情勢影響，發售與配送預定時期皆有變更之可能。\n*依據下單時間不同，到貨時間亦可能有所落差。",
     "contentDesc": "運動涼感運動毛巾 × 1",
-    "sizeMaterial": "\n・尺寸：寬約 900mm × 高約 300mm\n\n【材質】\n・聚酯纖維"
+    "sizeMaterial": "尺寸：寬約 900mm × 高約 300mm\n\n【材質】\n・聚酯纖維"
   },
-  { 
+{ 
     "id": "p6", 
     "title": "ヒメヒナダイカットビジュアルパネル", 
     "alias": "", 
     "price": 1100, 
     "imageUrl": "/images/himehina-virtual-panel.webp", 
     "status": "published", 
-    "specs": ["標準款"],
-    "releaseDate": "近期發售",
-    "bookingPeriod": "數量限定預購",
-    "shippingDate": "預計 2026 年 9 月左右配送",
-    "contentDesc": "壓克力視覺裝飾壓克力板 × 1",
-    "sizeMaterial": "A4 比例大小 / 材質：壓克力"
+    "specs": ["ver.ヒメ", "ver.ヒナ"],
+    "releaseDate": "預計於 2026年8月底 發售", 
+    "bookingPeriod": "2026年4月24日 起開放預購", 
+    "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動\n* 受國際情勢影響，出貨準備時間可能會比平時花費更多時間", 
+    "contentDesc": "HIMEHINA 壓克力造型立牌（可選擇款式）\n・ver.HIME\n・ver.HINA × 1", 
+    "sizeMaterial": "尺寸：全長約 260mm\n\n【材質】\n・壓克力\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
   },
   { 
     "id": "p7", 
@@ -113,5 +113,117 @@
     "shippingDate": "下單後 3 個工作天內出貨",
     "contentDesc": "角色立牌-酷帥款 × 1",
     "sizeMaterial": "高約 140mm / 材質：壓克力"
+  },
+  { 
+    "id": "p9", 
+    "title": "JOJIPPEN", 
+    "alias": "", 
+    "price": 350, 
+    "imageUrl": "/images/jojiipen.webp", 
+    "status": "published", 
+    "specs": ["標準款"],
+    "releaseDate": "預計於 2026年8月底 發售", 
+    "bookingPeriod": "2026年4月24日 起開放預購", 
+    "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動\n* 受國際情勢影響，出貨準備時間可能會比平時花費更多時間", 
+    "contentDesc": "JOJIIPEN 油性原子筆 × 1", 
+    "sizeMaterial": "\n・尺寸：全長約 140mm（0.5mm 筆芯）\n\n【材質】\n・ABS 樹脂\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
+  },
+  { 
+    "id": "p10", 
+    "title": "ヒメヒナスタンダード缶バッジ", 
+    "alias": "", 
+    "price": 150, 
+    "imageUrl": "/images/himehina-standard-can-badge.webp", 
+    "status": "published", 
+    "specs": ["A款", "B款", "C款", "D款", "E款", "F款"],
+    "releaseDate": "預計於 2026年8月底 發售", 
+    "bookingPeriod": "2026年4月24日 起開放預購", 
+    "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動\n* 受國際情勢影響，出貨準備時間可能會比平時花費更多時間", 
+    "contentDesc": "HIMEHINA 標準徽章（可選擇款式）\n・徽章 A款\n・徽章 B款\n・徽章 C款\n・徽章 D款\n・徽章 E款\n・徽章 F款 × 1", 
+    "sizeMaterial": "\n・尺寸：直徑約 56mm\n\n【材質】\n・紙、馬口鐵\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
+  },
+  { 
+    "id": "p11", 
+    "title": "ヒメヒナアクリルキーホルダー", 
+    "alias": "", 
+    "price": 250, 
+    "imageUrl": "/images/himehina-acrylic-keyholder.webp", 
+    "status": "published", 
+    "specs": ["A款", "B款", "C款"],
+    "releaseDate": "預計於 2026年8月底 發售", 
+    "bookingPeriod": "2026年4月24日 起開放預購", 
+    "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動\n* 受國際情勢影響，出貨準備時間可能會比平時花費更多時間", 
+    "contentDesc": "HIMEHINA 壓克力鑰匙圈（可選擇款式）\n・壓克力鑰匙圈 A款\n・壓克力鑰匙圈 B款\n・壓克力鑰匙圈 C款 × 1", 
+    "sizeMaterial": "\n・尺寸：寬約 55～60mm（依款式設計會有些許差異）\n\n【材質】\n・壓克力\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
+  },
+  { 
+    "id": "p12", 
+    "title": "ヒメヒナダイカットステッカーセット", 
+    "alias": "", 
+    "price": 200, 
+    "imageUrl": "/images/himehina-die-cut-sticker-set.webp", 
+    "status": "published", 
+    "specs": ["標準款"],
+    "releaseDate": "預計於 2026年8月底 發售", 
+    "bookingPeriod": "2026年4月24日 起開放預購", 
+    "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動\n* 受國際情勢影響，出貨準備時間可能會比平時花費更多時間", 
+    "contentDesc": "HIMEHINA 造型貼紙組 × 1", 
+    "sizeMaterial": "\n・尺寸：全長約 60mm（依款式設計會有些許差異）\n\n【材質】\n・紙\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
+  },
+  { 
+    "id": "p13", 
+    "title": "ヒメヒナクリアファイル", 
+    "alias": "", 
+    "price": 120, 
+    "imageUrl": "/images/himehina-clear-file.webp", 
+    "status": "published", 
+    "specs": ["標準款"],
+    "releaseDate": "預計於 2026年8月底 發售", 
+    "bookingPeriod": "2026年4月24日 起開放預購", 
+    "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動\n* 受國際情勢影響，出貨準備時間可能會比平時花費更多時間", 
+    "contentDesc": "HIMEHINA 資料夾 × 1", 
+    "sizeMaterial": "\n・尺寸：A4\n\n【材質】\n・PP\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
+  },
+  { 
+    "id": "p14", 
+    "title": "ヒメヒナネックストラップ", 
+    "alias": "", 
+    "price": 350, 
+    "imageUrl": "/images/himehina-neck-strap.webp", 
+    "status": "published", 
+    "specs": ["標準款"],
+    "releaseDate": "預計於 2026年8月底 發售", 
+    "bookingPeriod": "2026年4月24日 起開放預購", 
+    "shippingDate": "預計於 2026年8月底 依訂單順序陸續出貨\n* 8月底之後的訂單將依序進行配送\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動\n* 受國際情勢影響，出貨準備時間可能會比平時花費更多時間", 
+    "contentDesc": "HIMEHINA 識別證掛帶 × 1\n・夾片 × 1", 
+    "sizeMaterial": "\n・尺寸：寬約 25mm × 長約 450mm\n\n【材質】\n・聚酯纖維、PVC\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
+  },
+  { 
+    "id": "p15", 
+    "title": "伝説の“あれ”アクリルスタンド", 
+    "alias": "", 
+    "price": 400, 
+    "imageUrl": "/images/legendary-that-acrylic-stand.webp", 
+    "status": "published", 
+    "specs": ["標準款"],
+    "releaseDate": "", 
+    "bookingPeriod": "2026年4月1日（三）〜 2026年4月12日（日）", 
+    "shippingDate": "預計於 2026年6月上旬 陸續出貨\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動", 
+    "contentDesc": "傳說中的“那個”壓克力立牌 × 1", 
+    "sizeMaterial": "\n・尺寸：\n  田中姬 傳說中的“那個”壓克力立牌：W61mm × H124mm\n  鈴木雛 傳說中的“那個”壓克力立牌：W54mm × H124mm\n  底座：W55mm × H44mm\n\n【材質】\n・壓克力\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
+  },
+{ 
+    "id": "p16", 
+    "title": "【FC限定】HIMEHINA 7th Anniversary Live 2025『7th Heaven』初回生産限定豪華盤", 
+    "alias": "", 
+    "price": 3500, 
+    "imageUrl": "/images/himehina-7th-heaven-fc-limited-luxury-edition.webp", 
+    "status": "published", 
+    "specs": ["豪華盤"],
+    "releaseDate": "2026年6月26日（金）", 
+    "bookingPeriod": "2026年3月20日 起開放預購（若想確保能購買到商品，請於 2026年3月27日 23:59 前完成付款，數量有限售完為止）", 
+    "shippingDate": "預計於 2026年6月26日（五）起依訂單順序陸續出貨\n* 依據下單與付款時間不同，到貨時間亦可能有所落差\n* 配送狀況可能受實際物流影響而前後有所變動", 
+    "contentDesc": "【FC限定】HIMEHINA 7th Anniversary Live 2025『7th Heaven』初回生產限定豪華盤 Blu-ray (精裝數位板包裝) × 1\n\n【豪華盤特典】\n・7th Heaven 鐵盒特製外盒\n・穿著羽織袴姿的 HIMEHINA 迷你絨毛玩偶\n・7th 紀念便利貼（7款套組）\n・特典 Disc 3『7.7年回顧點心派對雜談』", 
+    "sizeMaterial": "【收錄內容】\n【Disc 1】\n01. Opening：試される合唱の大地\n02. LADY CRAZY\n03. 愛包ダンスホール\n04. ヒトガタ\n05. I'm Your Treasure Box\n06. ビビデバ\n07. ブラッディ・グルービー\n08. キセキ色\n09. 空っぽの箱庭\n10. Realize Dream\n11. Get out!! ～Chill Out Ver.～\n12. 花れ話れ\n13. 会いたいボクラ ～Ballade Ver.～\n14. ララ ～Acoustic Ver.～\n15. ハロ／ハワユ\n16. アストロノーツ\n17. 流れ行く命\n18. 涙の薫りがする ～Ballade Ver.～\n19. 相思相愛リフレクション\n20. ハレ\n21. マザードラッグ\n22. 水たまりRock\n23. キリカ\n24. 風編み鳥\n25. Encore Calling\n26. ライライラビットテイル (Encore)\n27. 密命 (Encore)\n28. うたかたよいかないで (Encore)\n\n【Disc 2】\n01. Opening：ザ・ベストニジュー\n02. Song Presented by ラプラス・ダークネス\n03. [20位] フリコドウル\n04. Song Presented by でびでび・でびる＆ルンルン\n05. [19位] アダムとマダム\n06. [18位] ララ\n07. Song Presented by 犬山たまき\n08. [17位] Hello, Hologram\n09. Song Presented by Nornis（戌亥とこ&町田ちま）\n10. [16位] 水たまりロンド\n11. [15位] 閃光花火\n12. [14位] Mr.VIRTUALIZER\n13. Song Presented by 角巻わため\n14. [13位] GOLDEN\n15. [12位] ヒバリ\n16. Song Presented by 周央サンゴ\n17. [11位] こだましがみ\n18. Song Presented by 空澄セナ＆猫汰つな\n19. [10位] 神喰姫\n20. [09位] 相思相愛リフレクション\n21. [08位] 琥珀の身体\n22. Song Presented by おめがシスターズ（おめがレイ＆おめがリオ）\n23. [07位] 3分ガール\n24. Song Presented by 樋口楓\n25. [06位] 藍の華\n26. [05位] 氷少女と陥落街\n27. Song Presented by 富士葵\n28. [04位] うたかたよいかないで\n29. 突撃インタビュー！チャーミー鈴木とビューティー田中\n30. [Spotlight] ボクラハ＆ナイデ\n31. [Spotlight] My Dear\n32. Song Presented by 緑仙\n33. [03位] ヒトガタ\n34. Song Presented by 白上フブキ\n35. [02位] WWW\n36. Song Presented by ラプラス・ダークネス\n37. [01位] 愛包ダンスホール\n38. Encore Calling\n39. AL『Bubblin』発表会\n40. キスキツネ (Encore)\n41. LADY CRAZY (Encore)\n42. 涙の薫りがする (Encore)\n43. LIFETIME is BUBBLIN News\n44. 一緒にプレミア公開！MV キスキツネ\n\n【Disc 3 ※豪華盤特典】\n01. 7.7年 振り返りお菓子パーティー雑談\n\n【注意事項】\n・商品圖片僅為示意圖，請以實際商品為主\n・商品規格與特典內容可能在未經預告的情況下進行變更"
   }
 ]

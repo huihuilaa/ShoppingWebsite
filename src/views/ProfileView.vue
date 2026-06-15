@@ -35,7 +35,10 @@ const toggleOrder = (id: string) => {
         
         <div v-if="expandedOrderId === order.id" class="order-expanded-details">
           <div v-for="item in order.items" :key="item.title" class="expanded-item-row">
-            <div class="exp-name">{{ item.title }} <small>({{ item.spec }})</small></div>
+            <div class="exp-name">
+              {{ item.title }} 
+              <span v-if="item.spec"><small>({{ item.spec }})</small></span>
+            </div>
             <div class="exp-qty">數量：{{ item.quantity }}</div>
             <div class="exp-price">NT${{ item.price }}</div>
             <div class="exp-subtotal pink-text">NT${{ item.price * item.quantity }}</div>
@@ -45,15 +48,15 @@ const toggleOrder = (id: string) => {
       </div>
     </div>
 
-    <div v-if="activeTab === 'info'" class="tab-content info-form-wrapper">
+    <div v-if="activeTab === 'info'" class="tab-content info-container">
       <div class="form-grid">
-        <div class="form-row"><label>姓名</label><input type="text" value="田中工作人員"></div>
-        <div class="form-row"><label>電子信箱</label><input type="email" value="himehina@example.com" disabled></div>
-        <div class="form-row"><label>電話</label><input type="text" value="0912345678"></div>
-        <div class="form-row"><label>預設地址</label><input type="text" value="高雄市大社區田中路 88 號"></div>
+        <div class="form-row"><label>姓名</label><input type="text" value=""></div>
+        <div class="form-row"><label>電子郵件</label><input type="email" value="" disabled></div>
+        <div class="form-row"><label>地址</label><input type="text" value=""></div>
+        <div class="form-row"><label>電話號碼</label><input type="text" value=""></div>
       </div>
-      <div style="text-align: right; margin-top: 20px;">
-        <button class="pink-btn-rect text-bold" style="width: 100px;">儲存</button>
+      <div class="form-action-row">
+        <button class="pink-btn-rect text-bold" style="width: 120px;">儲存</button>
       </div>
     </div>
   </div>
