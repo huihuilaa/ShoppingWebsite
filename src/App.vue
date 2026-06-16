@@ -47,7 +47,8 @@ const handleNavigate = (view: string, id?: string) => {
     <HomeView v-if="currentView === 'home'" @navigate="handleNavigate" />
     <ProductDetailView v-if="currentView === 'detail'" :id="selectedProductId" @navigate="handleNavigate" />
     <CartView v-if="currentView === 'cart'" @navigate="handleNavigate" />
-    <ProfileView v-if="currentView === 'profile'" @navigate="handleNavigate" />
+    
+    <ProfileView v-if="currentView === 'profile'" @navigate="handleNavigate" @logout="store.isLoggedIn = false; handleNavigate('home')" />
     
     <AuthView v-if="currentView === 'login'" mode="login" @login-success="store.isLoggedIn = true; handleNavigate('profile')" />
     <AuthView v-if="currentView === 'register'" mode="register" @login-success="store.isLoggedIn = true; handleNavigate('profile')" />

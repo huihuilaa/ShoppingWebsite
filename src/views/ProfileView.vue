@@ -6,8 +6,14 @@ const store = useShopStore();
 const activeTab = ref<'orders' | 'info'>('orders');
 const expandedOrderId = ref<string | null>(null);
 
+const emit = defineEmits(['logout']);
+
 const toggleOrder = (id: string) => {
   expandedOrderId.value = expandedOrderId.value === id ? null : id;
+};
+
+const handleLogout = () => {
+  emit('logout');
 };
 </script>
 
@@ -56,6 +62,7 @@ const toggleOrder = (id: string) => {
         <div class="form-row"><label>電話號碼</label><input type="text" value=""></div>
       </div>
       <div class="form-action-row">
+        <button class="logout-btn text-bold" @click="handleLogout">登出</button>
         <button class="pink-btn-rect text-bold" style="width: 120px;">儲存</button>
       </div>
     </div>
