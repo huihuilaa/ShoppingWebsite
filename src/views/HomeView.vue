@@ -69,7 +69,6 @@ onMounted(() => {
 
 <template>
   <div class="home-custom-layout">
-    <!-- 搜尋結果提示 -->
     <div v-if="searchQuery" class="search-result-hint">
       搜尋「{{ searchQuery }}」共 {{ sortedProducts.length }} 筆結果
       <RouterLink to="/" class="clear-search-link">✕ 清除搜尋</RouterLink>

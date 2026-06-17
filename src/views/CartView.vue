@@ -44,7 +44,6 @@ const finalTotal = computed(() =>
 );
 
 onMounted(() => {
-  // router guard 已確保有登入才進得來，直接載入
   store.loadCart();
 });
 </script>

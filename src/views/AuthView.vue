@@ -28,7 +28,6 @@ const handleSubmit = async () => {
       alert('登入成功！');
     }
     store.isLoggedIn = true;
-    // 登入後導回原本要去的頁面，或預設到 profile
     const redirect = route.query.redirect as string | undefined;
     router.push(redirect || '/profile');
   } catch (error: any) {
