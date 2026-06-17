@@ -1103,3 +1103,240 @@ button:focus-visible {
 .auth-switch-links a:hover {
   color: #ff66a3;
 }
+
+.filter-search-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 40px 0 30px 0;
+  width: 100%;
+}
+
+.search-box-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.search-input-field {
+  width: 250px;
+  height: 36px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0;
+  padding: 0 35px 0 12px;
+  box-sizing: border-box;
+  outline: none;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+
+.search-input-field:focus {
+  border-color: #5ea6e4;
+}
+
+.clear-search-btn {
+  position: absolute;
+  left: 220px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.clear-search-btn:hover {
+  color: #ff66a3;
+}
+
+.search-action-btn {
+  background-color: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 0;
+  padding: 0 20px;
+  height: 36px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.search-action-btn:hover {
+  background-color: #404040;
+  border-color: #404040;
+}
+
+.sort-select-wrapper {
+  position: relative;
+}
+
+.sort-dropdown {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  cursor: pointer;
+  outline: none;
+  min-width: 130px;
+  text-align: center;
+}
+
+.sort-dropdown:focus {
+  border-color: #5ea6e4;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  padding: 20px 0 60px 0;
+  width: 100%;
+}
+
+.product-img-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+.product-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-card-info {
+  width: 100%;
+  text-align: left;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 5px;
+  box-sizing: border-box;
+}
+
+.product-card-title {
+  font-size: 1.05rem;
+  color: #2c3e50;
+  font-weight: bold;
+  line-height: 1.4;
+  margin: 0 0 6px 0;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8em;
+}
+
+.product-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: auto;
+}
+
+.product-card-price {
+  font-size: 1.2rem;
+  color: #ff66a3;
+  font-weight: bold;
+}
+
+.product-card-view-btn:hover {
+  background-color: #5ea6e4;
+  color: #ffffff;
+}
+
+.empty-products-container {
+  text-align: center;
+  padding: 80px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.empty-products-text {
+  color: #767676;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 40px 0 60px 0;
+  width: 100%;
+}
+
+.page-nav-btn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1a1a1a;
+  font-weight: bold;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.page-nav-btn:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
+}
+
+.page-numbers-list {
+  display: flex;
+  gap: 8px;
+}
+
+.page-number-btn {
+  background-color: #d9d9d9;
+  border: none;
+  color: #1a1a1a;
+  font-weight: bold;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.page-number-btn.active {
+  background-color: #ff66a3;
+  color: #ffffff;
+}
+
+.product-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+.product-card:active {
+  transform: translateY(-1px);
+}

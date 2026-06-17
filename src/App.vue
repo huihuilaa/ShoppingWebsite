@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useShopStore } from './store/shop';
-import { auth } from '../src/lib/firebase';
+import { auth } from './lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 import HomeView from './views/HomeView.vue';
@@ -9,9 +9,10 @@ import ProductDetailView from './views/ProductDetailView.vue';
 import CartView from './views/CartView.vue';
 import ProfileView from './views/ProfileView.vue';
 import AuthView from './views/AuthView.vue';
+import AdminView from './views/AdminView.vue'; // 1. 引入管理員後台
 
 const store = useShopStore();
-const currentView = ref('home');
+const currentView = ref('home'); // 如果你想開網頁直接看後台，可以先把這行改成 ref('admin')
 const selectedProductId = ref<string | null>(null);
 
 const handleNavigate = (view: string, id?: string) => {
@@ -48,35 +49,52 @@ const handleAuth = async (mode: 'login' | 'register', data: any) => {
     }
   }
 };
+
+const searchQuery = ref('');
+
+const handleNavbarSearch = () => {
+  if (searchQuery.value.trim() !== '') {
+    currentView.value = 'home';
+  }
+};
 </script>
 
 <template>
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-left" @click="handleNavigate('home')">
-        <img src="/images/logo.png" class="nav-logo">
+        <img src="/images/logo.png" class="nav-logo" @contextmenu.prevent="handleNavigate('admin')">
       </div>
       
-      <div class="nav-search-wrapper" v-if="currentView === 'home'">
-        <input type="text" placeholder="搜尋商品..." class="nav-search-input">
-      </div>
+    <div class="nav-search-wrapper" v-if="currentView === 'home'">
+      <input 
+        type="text" 
+        placeholder="搜尋商品..." 
+        class="nav-search-input"
+        v-model="searchQuery"
+        @keyup.enter="handleNavbarSearch"
+      >
+    </div>
 
       <div class="nav-right">
         <a class="nav-link" @click.prevent="handleNavigate('home')">商品</a>
         <a class="nav-link" @click.prevent="handleNavigate('profile')">會員中心</a>
         <a class="nav-link" @click.prevent="handleNavigate('cart')">購物車</a>
+        <a class="nav-link" @click.prevent="handleNavigate('admin')" style="color: #5ea6e4;">管理後台</a>
       </div>
     </div>
   </nav>
 
   <main class="main-content">
-    <HomeView v-if="currentView === 'home'" @navigate="handleNavigate" />
+    <HomeView v-if="currentView === 'home'" :search-query="searchQuery" @navigate="handleNavigate"@clear-search="searchQuery = ''" />
     <ProductDetailView v-if="currentView === 'detail'" :product-id="selectedProductId || ''" @navigate="handleNavigate" />
     <CartView v-if="currentView === 'cart'" @navigate="handleNavigate" />
     <ProfileView v-if="currentView === 'profile'" @navigate="handleNavigate" @logout="store.isLoggedIn = false; handleNavigate('home')" />
     
     <AuthView v-if="currentView === 'login'" mode="login" @auth-action="(data) => handleAuth('login', data)" @switch-mode="currentView = 'register'" />
     <AuthView v-if="currentView === 'register'" mode="register" @auth-action="(data) => handleAuth('register', data)" @switch-mode="currentView = 'login'" />
+    
+    <AdminView v-if="currentView === 'admin'" />
   </main>
 
   <footer class="footer">
