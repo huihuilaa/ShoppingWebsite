@@ -14,10 +14,9 @@ import AdminView from './views/AdminView.vue';
 const store = useShopStore();
 const currentView = ref('home');
 const selectedProductId = ref<string | null>(null);
-const currentProductId = ref('');
 
 const handleNavigate = (view: string, id?: string) => {
-  if (view === 'profile' && !store.isLoggedIn) {
+  if ((view === 'profile' || view === 'admin') && !store.isLoggedIn) {
     currentView.value = 'login';
     return;
   }
@@ -66,16 +65,16 @@ const handleNavbarSearch = () => {
       <div class="nav-left" @click="handleNavigate('home')">
         <img src="/images/logo.png" class="nav-logo" @contextmenu.prevent="handleNavigate('admin')">
       </div>
-      
-    <div class="nav-search-wrapper" v-if="currentView === 'home'">
-      <input 
-        type="text" 
-        placeholder="搜尋商品..." 
-        class="nav-search-input"
-        v-model="searchQuery"
-        @keyup.enter="handleNavbarSearch"
-      >
-    </div>
+
+      <div class="nav-search-wrapper" v-if="currentView === 'home'">
+        <input
+          type="text"
+          placeholder="搜尋商品..."
+          class="nav-search-input"
+          v-model="searchQuery"
+          @keyup.enter="handleNavbarSearch"
+        >
+      </div>
 
       <div class="nav-right">
         <a class="nav-link" @click.prevent="handleNavigate('home')">商品</a>
@@ -87,14 +86,24 @@ const handleNavbarSearch = () => {
   </nav>
 
   <main class="main-content">
-    <HomeView v-if="currentView === 'home'" :search-query="searchQuery" @navigate="handleNavigate"@clear-search="searchQuery = ''" />
+    <HomeView
+      v-if="currentView === 'home'"
+      :search-query="searchQuery"
+      @navigate="handleNavigate"
+      @clear-search="searchQuery = ''"
+    />
     <ProductDetailView v-if="currentView === 'detail'" :product-id="selectedProductId || ''" @navigate="handleNavigate" />
     <CartView v-if="currentView === 'cart'" @navigate="handleNavigate" />
-    <ProfileView v-if="currentView === 'profile'" :product-id="currentProductId" @navigate="handleNavigate" @logout="store.isLoggedIn = false; handleNavigate('home')" />
-    
+    <ProfileView
+      v-if="currentView === 'profile'"
+      :product-id="selectedProductId || ''"
+      @navigate="handleNavigate"
+      @logout="store.isLoggedIn = false; handleNavigate('home')"
+    />
+
     <AuthView v-if="currentView === 'login'" mode="login" @auth-action="(data) => handleAuth('login', data)" @switch-mode="currentView = 'register'" />
     <AuthView v-if="currentView === 'register'" mode="register" @auth-action="(data) => handleAuth('register', data)" @switch-mode="currentView = 'login'" />
-    
+
     <AdminView v-if="currentView === 'admin'" />
   </main>
 

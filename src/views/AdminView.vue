@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { db } from '../lib/firebase';
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 
@@ -11,6 +11,18 @@ const description = ref('');
 
 const products = ref<any[]>([]);
 const editingId = ref<string | null>(null);
+
+const ITEMS_PER_PAGE = 5;
+const currentPage = ref(1);
+
+const totalPages = computed(() =>
+  Math.ceil(products.value.length / ITEMS_PER_PAGE)
+);
+
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * ITEMS_PER_PAGE;
+  return products.value.slice(start, start + ITEMS_PER_PAGE);
+});
 
 const loadAdminProducts = async () => {
   try {
@@ -61,8 +73,9 @@ const handleUpload = async () => {
     imageUrl.value = '';
     specInput.value = '';
     description.value = '';
-    
+
     await loadAdminProducts();
+    currentPage.value = 1;
   } catch (error) {
     console.error(error);
     alert('操作失敗，請檢查權限。');
@@ -94,6 +107,9 @@ const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, 'products', id));
     alert('商品已刪除！');
     await loadAdminProducts();
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = Math.max(1, totalPages.value);
+    }
   } catch (error) {
     console.error(error);
   }
@@ -146,26 +162,52 @@ onMounted(() => {
 
     <div class="auth-card admin-list-card">
       <h3 class="auth-title admin-list-title">現有商品清單庫存</h3>
+
       <div v-if="products.length === 0" class="admin-empty-text">目前資料庫沒有任何商品</div>
-      <div v-else class="admin-list-wrapper">
-        <div 
-          v-for="item in products" 
-          :key="item.id" 
-          class="admin-list-item"
-        >
-          <div class="admin-item-left">
-            <img :src="item.imageUrl" class="admin-item-img">
-            <div>
-              <div class="admin-item-title">{{ item.title }}</div>
-              <div class="admin-item-price">NT${{ item.price }}</div>
+
+      <template v-else>
+        <div class="admin-list-wrapper">
+          <div
+            v-for="item in paginatedProducts"
+            :key="item.id"
+            class="admin-list-item"
+          >
+            <div class="admin-item-left">
+              <img :src="item.imageUrl" class="admin-item-img">
+              <div>
+                <div class="admin-item-title">{{ item.title }}</div>
+                <div class="admin-item-price">NT${{ item.price }}</div>
+              </div>
+            </div>
+            <div class="admin-item-actions">
+              <button class="secondary-btn-rect admin-action-btn" @click="startEdit(item)">編輯</button>
+              <button class="pink-btn-rect admin-action-btn admin-delete-btn" @click="handleDelete(item.id)">刪除</button>
             </div>
           </div>
-          <div class="admin-item-actions">
-            <button class="secondary-btn-rect admin-action-btn" @click="startEdit(item)">編輯</button>
-            <button class="pink-btn-rect admin-action-btn admin-delete-btn" @click="handleDelete(item.id)">刪除</button>
-          </div>
         </div>
-      </div>
+
+        <div class="pagination-wrap" v-if="totalPages > 1">
+          <button
+            class="page-btn"
+            :disabled="currentPage === 1"
+            @click="currentPage--"
+          >‹</button>
+
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            class="page-btn"
+            :class="{ active: currentPage === page }"
+            @click="currentPage = page"
+          >{{ page }}</button>
+
+          <button
+            class="page-btn"
+            :disabled="currentPage === totalPages"
+            @click="currentPage++"
+          >›</button>
+        </div>
+      </template>
     </div>
   </div>
 </template>

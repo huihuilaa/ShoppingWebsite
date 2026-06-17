@@ -241,6 +241,19 @@ button:focus-visible {
   align-items: center;
   gap: 4px;
   font-weight: bold;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-link:hover {
+  background-color: #f0f4f8;
+  color: #ff66a3;
+}
+
+.nav-link:active {
+  background-color: #e2e8f0;
 }
 
 .nav-cart-btn {
@@ -1653,4 +1666,48 @@ button:focus-visible {
 
 .detail-info button.pink-btn-rect.btn-detail-add-cart:hover {
   background-color: #f0f6fc;
+}
+/* ===== 分頁 ===== */
+.pagination-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 40px 0 60px 0;
+}
+
+.page-btn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #ff66a3;
+  color: #ff66a3;
+}
+
+.page-btn.active {
+  background-color: #ff66a3;
+  border-color: #ff66a3;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.page-btn:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { getAllProductsService } from '../api/products';
 
 const emit = defineEmits<{
@@ -9,6 +9,10 @@ const emit = defineEmits<{
 const products = ref<any[]>([]);
 const loading = ref(true);
 const sortOrder = ref('default');
+
+// 分頁
+const ITEMS_PER_PAGE = 12;
+const currentPage = ref(1);
 
 const loadAllProducts = async () => {
   try {
@@ -29,6 +33,20 @@ const sortedProducts = computed(() => {
     return list.sort((a, b) => Number(b.price) - Number(a.price));
   }
   return list;
+});
+
+const totalPages = computed(() =>
+  Math.ceil(sortedProducts.value.length / ITEMS_PER_PAGE)
+);
+
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * ITEMS_PER_PAGE;
+  return sortedProducts.value.slice(start, start + ITEMS_PER_PAGE);
+});
+
+// 排序改變時重置回第一頁
+watch(sortOrder, () => {
+  currentPage.value = 1;
 });
 
 const featuredProducts = computed(() => {
@@ -92,23 +110,47 @@ onMounted(() => {
       <p class="empty-products-text">目前沒有任何商品。</p>
     </div>
 
-    <div v-else class="custom-four-columns">
-      <div 
-        v-for="product in sortedProducts" 
-        :key="product.id" 
-        class="product-card"
-        @click="emit('navigate', 'detail', product.id)"
-      >
-        <div class="product-img-wrapper">
-          <img :src="product.imageUrl" :alt="product.title" class="product-card-img">
-        </div>
-        <div class="product-card-info">
-          <h4 class="product-card-title">{{ product.title }}</h4>
-          <div class="product-card-footer">
-            <div class="product-card-price">NT${{ product.price }}</div>
+    <template v-else>
+      <div class="custom-four-columns">
+        <div 
+          v-for="product in paginatedProducts" 
+          :key="product.id" 
+          class="product-card"
+          @click="emit('navigate', 'detail', product.id)"
+        >
+          <div class="product-img-wrapper">
+            <img :src="product.imageUrl" :alt="product.title" class="product-card-img">
+          </div>
+          <div class="product-card-info">
+            <h4 class="product-card-title">{{ product.title }}</h4>
+            <div class="product-card-footer">
+              <div class="product-card-price">NT${{ product.price }}</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <div class="pagination-wrap" v-if="totalPages > 1">
+        <button
+          class="page-btn"
+          :disabled="currentPage === 1"
+          @click="currentPage--"
+        >‹</button>
+
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          class="page-btn"
+          :class="{ active: currentPage === page }"
+          @click="currentPage = page"
+        >{{ page }}</button>
+
+        <button
+          class="page-btn"
+          :disabled="currentPage === totalPages"
+          @click="currentPage++"
+        >›</button>
+      </div>
+    </template>
   </div>
 </template>
