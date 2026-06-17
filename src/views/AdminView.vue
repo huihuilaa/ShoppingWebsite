@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { db } from '../lib/firebase';
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
+
+const router = useRouter();
+const leaveAdmin = () => {
+  sessionStorage.removeItem('adminVerified');
+  router.push('/');
+};
 
 const title = ref('');
 const price = ref(0);
@@ -123,8 +130,9 @@ onMounted(() => {
 <template>
   <div class="container main-content auth-page-container">
     <div class="auth-card">
-      <div class="admin-header-row">
+      <div class="admin-header-row" style="display:flex; justify-content:space-between; align-items:center;">
         <h2 class="auth-title">{{ editingId ? '編輯商品資訊' : '上傳新商品 (管理員後台)' }}</h2>
+        <button class="secondary-btn-rect" @click="leaveAdmin" style="font-size:0.85rem;">離開後台</button>
       </div>
       
       <div class="auth-form">

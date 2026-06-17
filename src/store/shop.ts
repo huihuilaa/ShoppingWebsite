@@ -1,81 +1,90 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { productAPI, cartAPI, userAPI } from '../api';
-import { db } from '../lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { ref } from 'vue';
+import { db, auth } from '../lib/firebase';
+import {
+  collection, addDoc, getDocs, deleteDoc,
+  doc, query, where, orderBy
+} from 'firebase/firestore';
 
 export const useShopStore = defineStore('shop', () => {
   const isLoggedIn = ref(false);
-  const products = ref<any[]>([]);
   const cartItems = ref<any[]>([]);
   const orders = ref<any[]>([]);
 
-  const fetchAllProducts = async (page = 1, limit = 12, sortBy = '') => {
+  const loadCart = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
     try {
-      const res = await productAPI.getProducts(page, limit, sortBy);
-      products.value = res.data.products;
+      const q = query(
+        collection(db, 'carts'),
+        where('userId', '==', currentUser.uid),
+        orderBy('createdAt', 'desc')
+      );
+      const snapshot = await getDocs(q);
+      cartItems.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-      console.error(error);
+      console.error('載入購物車失敗:', error);
     }
   };
 
-  const fetchUserOrders = async (uid: string) => {
+  const addToCart = async (product: any, spec: string, quantity: number) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      alert('請先登入');
+      return;
+    }
     try {
-      const res = await userAPI.getOrders(uid);
-      orders.value = res.data.orders;
+      const cartItemData = {
+        userId: currentUser.uid,
+        productId: product.id,
+        title: product.title,
+        price: Number(product.price),
+        imageUrl: product.imageUrl || '',
+        selectedSpec: spec || '標準款',
+        quantity: quantity,
+        checked: true,
+        createdAt: new Date().getTime()
+      };
+      const docRef = await addDoc(collection(db, 'carts'), cartItemData);
+      cartItems.value.push({ id: docRef.id, ...cartItemData });
     } catch (error) {
       console.error(error);
+      alert('加入購物車失敗');
     }
   };
-
-const addToCart = async (product: any, spec: string, quantity: number) => {
-  try {
-    const cartRef = collection(db, 'carts');
-    
-    const cartItemData = {
-      productId: product.id,
-      title: product.title,
-      price: Number(product.price),
-      imageUrl: product.imageUrl || '',
-      selectedSpec: spec || '標準款',
-      quantity: quantity,
-      checked: true,
-      createdAt: new Date().getTime()
-    };
-
-    const docRef = await addDoc(cartRef, cartItemData);
-
-    cartItems.value.push({
-      id: docRef.id,
-      product,
-      selectedSpec: spec || '標準款',
-      quantity,
-      checked: true
-    });
-
-  } catch (error) {
-    console.error(error);
-    alert('加入購物車失敗');
-  }
-};
 
   const removeFromCart = async (id: string) => {
     try {
-      await cartAPI.removeFromCart(id);
+      await deleteDoc(doc(db, 'carts', id));
       cartItems.value = cartItems.value.filter(item => item.id !== id);
     } catch (error) {
       alert('刪除失敗');
     }
   };
 
+  const fetchUserOrders = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+    try {
+      const q = query(
+        collection(db, 'orders'),
+        where('userId', '==', currentUser.uid),
+        orderBy('createdAt', 'desc')
+      );
+      const snapshot = await getDocs(q);
+      orders.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error('載入訂單失敗:', error);
+    }
+  };
+
   return {
     isLoggedIn,
-    products,
     cartItems,
     orders,
-    fetchAllProducts,
-    fetchUserOrders,
+    loadCart,
     addToCart,
-    removeFromCart
+    removeFromCart,
+    fetchUserOrders,
   };
 });

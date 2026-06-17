@@ -3,23 +3,30 @@ import { ref, watch } from 'vue';
 
 const props = defineProps<{
   initialEmail: string;
+  initialName?: string;
+  initialAddress?: string;
+  initialPhone?: string;
 }>();
 
 const emit = defineEmits<{
-  (e: 'save'): void;
+  (e: 'save', data: { name: string; email: string; address: string; phone: string }): void;
   (e: 'logout'): void;
 }>();
 
 const profileForm = ref({
-  name: '',
+  name: props.initialName || '',
   email: props.initialEmail,
-  address: '',
-  phone: ''
+  address: props.initialAddress || '',
+  phone: props.initialPhone || ''
 });
 
 watch(() => props.initialEmail, (newEmail) => {
   profileForm.value.email = newEmail;
 });
+
+watch(() => props.initialName, (v) => { if (v !== undefined) profileForm.value.name = v; });
+watch(() => props.initialAddress, (v) => { if (v !== undefined) profileForm.value.address = v; });
+watch(() => props.initialPhone, (v) => { if (v !== undefined) profileForm.value.phone = v; });
 </script>
 
 <template>
@@ -50,7 +57,7 @@ watch(() => props.initialEmail, (newEmail) => {
       <button class="btn-profile-logout" @click="emit('logout')">
         登出
       </button>
-      <button class="pink-btn-rect text-bold btn-submit-profile" @click="emit('save')">
+      <button class="pink-btn-rect text-bold btn-submit-profile" @click="emit('save', profileForm)">
         儲存
       </button>
     </div>

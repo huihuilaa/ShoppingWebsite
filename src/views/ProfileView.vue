@@ -1,134 +1,121 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { auth, db } from '../lib/firebase';
+import { signOut } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useShopStore } from '../store/shop';
-import { getProductByIdService } from '../api/products';
+import InfoForm from '../components/profile/InfoForm.vue';
+import OrderList from '../components/profile/OrderList.vue';
 
-const props = defineProps<{ productId: string }>();
-
-const emit = defineEmits<{
-  (e: 'navigate', view: string): void
-}>();
-
+const router = useRouter();
 const store = useShopStore();
-const product = ref<any>(null);
-const selectedSpec = ref('');
-const selectedQuantity = ref(1);
+const activeTab = ref<'info' | 'orders'>('info');
+const userEmail = ref('');
+const userName = ref('');
+const userAddress = ref('');
+const userPhone = ref('');
+const ordersLoading = ref(false);
 
-const loadProductDetail = async () => {
-  if (!props.productId) return;
-  
+const loadProfile = async () => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+  userEmail.value = currentUser.email || '';
   try {
-    product.value = await getProductByIdService(props.productId);
-    
-    if (product.value?.specs && product.value.specs.length > 0) {
-      selectedSpec.value = product.value.specs[0] || '';
+    const docSnap = await getDoc(doc(db, 'users', currentUser.uid));
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      userName.value = data.name || '';
+      userAddress.value = data.address || '';
+      userPhone.value = data.phone || '';
     }
   } catch (error) {
-    console.error(error);
+    console.error('載入會員資料失敗:', error);
   }
 };
 
-const updateQuantity = (change: number) => {
-  const newQty = selectedQuantity.value + change;
-  if (newQty >= 1 && newQty <= 10) {
-    selectedQuantity.value = newQty;
+const loadOrders = async () => {
+  ordersLoading.value = true;
+  await store.fetchUserOrders();
+  ordersLoading.value = false;
+};
+
+const handleSave = async (formData: { name: string; email: string; address: string; phone: string }) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+  try {
+    await setDoc(doc(db, 'users', currentUser.uid), {
+      name: formData.name,
+      email: formData.email,
+      address: formData.address,
+      phone: formData.phone,
+      updatedAt: new Date().getTime(),
+    }, { merge: true });
+    alert('資料已儲存！');
+  } catch (error) {
+    console.error('儲存失敗:', error);
+    alert('儲存失敗，請稍後再試');
   }
 };
 
-const addToCart = async () => {
-  if (product.value) {
-    await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
-    alert('已成功加入購物車！');
-  }
+const handleLogout = async () => {
+  await signOut(auth);
+  store.isLoggedIn = false;
+  sessionStorage.removeItem('adminVerified');
+  router.push('/');
 };
 
-const buyNow = async () => {
-  if (product.value) {
-    await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
-    emit('navigate', 'cart');
+const switchTab = (tab: 'info' | 'orders') => {
+  activeTab.value = tab;
+  if (tab === 'orders') {
+    loadOrders();
   }
 };
 
 onMounted(() => {
-  loadProductDetail();
+  loadProfile();
 });
 </script>
 
 <template>
-  <div class="container" v-if="product">
-    <div class="detail-layout">
-      <div class="detail-img-wrap">
-        <img :src="product.imageUrl" :alt="product.title">
+  <div class="container main-content">
+    <div class="profile-tab-container">
+      <div class="profile-header-title">
+        <span class="blue-sq">■</span>會員中心
       </div>
-      
-      <div class="detail-info">
-        <h1 class="detail-title">
-          {{ product.title }} <span class="detail-alias" v-if="product.alias">{{ product.alias }}</span>
-        </h1>
-        
-        <div class="info-row-group">
-          <div class="info-row align-start">
-            <span class="info-label btn-label-pad">規格：</span>
-            <div class="detail-spec-buttons-wrap">
-              <button
-                v-for="spec in product.specs"
-                :key="spec"
-                class="spec-select-btn"
-                :class="{ active: selectedSpec === spec }"
-                @click="selectedSpec = spec"
-              >
-                {{ spec }}
-              </button>
-            </div>
-          </div>
 
-          <div class="info-row">
-            <span class="info-label">數量：</span>
-            <div class="quantity-counter-box">
-              <button class="qty-btn" @click="updateQuantity(-1)" :disabled="selectedQuantity <= 1">-</button>
-              <span class="qty-number-display">{{ selectedQuantity }}</span>
-              <button class="qty-btn" @click="updateQuantity(1)" :disabled="selectedQuantity >= 10">+</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="action-group detail-action-margin">
-          <button class="btn-detail-add-cart" @click="addToCart">加入購物車</button>
-          <button class="btn-buy-now" @click="buyNow">立即購買</button>
-        </div>
+      <div class="profile-tabs-nav">
+        <button
+          class="tab-nav-btn"
+          :class="{ active: activeTab === 'info' }"
+          @click="switchTab('info')"
+        >
+          會員資料
+        </button>
+        <button
+          class="tab-nav-btn"
+          :class="{ active: activeTab === 'orders' }"
+          @click="switchTab('orders')"
+        >
+          訂單紀錄
+        </button>
       </div>
-    </div>
 
-    <div class="product-info-section">
-      <div class="section-title">
-        <span class="blue-sq">■</span>商品資訊 <span class="en">PRODUCT INFO</span>
-      </div>
-      
-      <div class="info-content-box custom-info-box">
-        <div class="content-row" v-if="product.bookingPeriod">
-          <span class="content-label">預購期間：</span>
-          <p class="content-text custom-text-style">{{ product.bookingPeriod }}</p>
-        </div>
-
-        <div class="content-row" v-if="product.releaseDate">
-          <span class="content-label">發售日期：</span>
-          <p class="content-text custom-text-style">{{ product.releaseDate }}</p>
-        </div>
-
-        <div class="content-row" v-if="product.shippingDate">
-          <span class="content-label">商品配送：</span>
-          <p class="content-text custom-text-style pre-line-style">{{ product.shippingDate }}</p>
-        </div>
-
-        <div class="content-row" v-if="product.contentDesc">
-          <span class="content-label">商品內容：</span>
-          <p class="content-text custom-text-style">{{ product.contentDesc }}</p>
-        </div>
-
-        <div class="content-row" v-if="product.sizeMaterial">
-          <span class="content-label">商品規格：</span>
-          <p class="content-text custom-text-style pre-line-style">{{ product.sizeMaterial }}</p>
-        </div>
+      <div class="profile-tab-content-card">
+        <InfoForm
+          v-if="activeTab === 'info'"
+          :initial-email="userEmail"
+          :initial-name="userName"
+          :initial-address="userAddress"
+          :initial-phone="userPhone"
+          @save="handleSave"
+          @logout="handleLogout"
+        />
+        <OrderList
+          v-if="activeTab === 'orders'"
+          :orders="store.orders"
+          :loading="ordersLoading"
+        />
       </div>
     </div>
   </div>

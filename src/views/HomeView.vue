@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { getAllProductsService } from '../api/products';
 
-const emit = defineEmits<{
-  (e: 'navigate', view: string, productId?: string): void
-}>();
+const router = useRouter();
+const route = useRoute();
 
 const products = ref<any[]>([]);
 const loading = ref(true);
 const sortOrder = ref('default');
 
-// 分頁
 const ITEMS_PER_PAGE = 12;
 const currentPage = ref(1);
 
@@ -25,8 +24,19 @@ const loadAllProducts = async () => {
   }
 };
 
+// 搜尋：從 URL query 取得
+const searchQuery = computed(() => (route.query.q as string) || '');
+
+const filteredProducts = computed(() => {
+  if (!searchQuery.value.trim()) return products.value;
+  const q = searchQuery.value.toLowerCase();
+  return products.value.filter(p =>
+    p.title?.toLowerCase().includes(q) || p.alias?.toLowerCase().includes(q)
+  );
+});
+
 const sortedProducts = computed(() => {
-  const list = [...products.value];
+  const list = [...filteredProducts.value];
   if (sortOrder.value === 'price-asc') {
     return list.sort((a, b) => Number(a.price) - Number(b.price));
   } else if (sortOrder.value === 'price-desc') {
@@ -44,8 +54,7 @@ const paginatedProducts = computed(() => {
   return sortedProducts.value.slice(start, start + ITEMS_PER_PAGE);
 });
 
-// 排序改變時重置回第一頁
-watch(sortOrder, () => {
+watch([sortOrder, searchQuery], () => {
   currentPage.value = 1;
 });
 
@@ -60,7 +69,13 @@ onMounted(() => {
 
 <template>
   <div class="home-custom-layout">
-    <div class="featured-top-section">
+    <!-- 搜尋結果提示 -->
+    <div v-if="searchQuery" class="search-result-hint">
+      搜尋「{{ searchQuery }}」共 {{ sortedProducts.length }} 筆結果
+      <RouterLink to="/" class="clear-search-link">✕ 清除搜尋</RouterLink>
+    </div>
+
+    <div class="featured-top-section" v-if="!searchQuery">
       <div class="custom-title-style">
         <span class="blue-sq">■</span>推薦商品<span class="en">FEATURED PRODUCTS</span>
       </div>
@@ -75,7 +90,7 @@ onMounted(() => {
           v-for="product in featuredProducts" 
           :key="product.id" 
           class="featured-card"
-          @click="emit('navigate', 'detail', product.id)"
+          @click="router.push(`/product/${product.id}`)"
         >
           <div class="product-img-wrapper">
             <img :src="product.imageUrl" :alt="product.title" class="product-card-img">
@@ -107,7 +122,7 @@ onMounted(() => {
     </div>
 
     <div v-else-if="sortedProducts.length === 0" class="empty-products-container">
-      <p class="empty-products-text">目前沒有任何商品。</p>
+      <p class="empty-products-text">找不到符合的商品。</p>
     </div>
 
     <template v-else>
@@ -116,7 +131,7 @@ onMounted(() => {
           v-for="product in paginatedProducts" 
           :key="product.id" 
           class="product-card"
-          @click="emit('navigate', 'detail', product.id)"
+          @click="router.push(`/product/${product.id}`)"
         >
           <div class="product-img-wrapper">
             <img :src="product.imageUrl" :alt="product.title" class="product-card-img">

@@ -1,31 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { db } from '../lib/firebase';
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
+import { useShopStore } from '../store/shop';
 
-const emit = defineEmits<{
-  (e: 'navigate', view: string): void
-}>();
-
-const cartItems = ref<any[]>([]);
-const shippingFee = ref(50);
-
-const loadCartItems = async () => {
-  try {
-    const querySnapshot = await getDocs(collection(db, 'carts'));
-    cartItems.value = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-  } catch (error) {
-    console.error(error);
-  }
-};
+const router = useRouter();
+const store = useShopStore();
+const cartItems = computed(() => store.cartItems);
+const shippingFee = 50;
 
 const updateQuantity = async (item: any, newQty: number) => {
   try {
-    const docRef = doc(db, 'carts', item.id);
-    await updateDoc(docRef, { quantity: Number(newQty) });
+    await updateDoc(doc(db, 'carts', item.id), { quantity: Number(newQty) });
     item.quantity = Number(newQty);
   } catch (error) {
     console.error(error);
@@ -34,8 +21,7 @@ const updateQuantity = async (item: any, newQty: number) => {
 
 const toggleCheck = async (item: any) => {
   try {
-    const docRef = doc(db, 'carts', item.id);
-    await updateDoc(docRef, { checked: !item.checked });
+    await updateDoc(doc(db, 'carts', item.id), { checked: !item.checked });
     item.checked = !item.checked;
   } catch (error) {
     console.error(error);
@@ -44,26 +30,22 @@ const toggleCheck = async (item: any) => {
 
 const removeCartItem = async (id: string) => {
   if (!confirm('確定要將此商品從購物車中移除嗎？')) return;
-  try {
-    await deleteDoc(doc(db, 'carts', id));
-    cartItems.value = cartItems.value.filter(item => item.id !== id);
-  } catch (error) {
-    console.error(error);
-  }
+  await store.removeFromCart(id);
 };
 
-const subtotal = computed(() => {
-  return cartItems.value
+const subtotal = computed(() =>
+  cartItems.value
     .filter(item => item.checked)
-    .reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
-});
+    .reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
+);
 
-const finalTotal = computed(() => {
-  return subtotal.value > 0 ? subtotal.value + shippingFee.value : 0;
-});
+const finalTotal = computed(() =>
+  subtotal.value > 0 ? subtotal.value + shippingFee : 0
+);
 
 onMounted(() => {
-  loadCartItems();
+  // router guard 已確保有登入才進得來，直接載入
+  store.loadCart();
 });
 </script>
 

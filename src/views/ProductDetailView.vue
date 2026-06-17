@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useShopStore } from '../store/shop';
 import { getProductByIdService } from '../api/products';
 import type { Product } from '../types'; 
@@ -8,10 +9,7 @@ const props = defineProps<{
   productId: string 
 }>();
 
-const emit = defineEmits<{
-  (e: 'navigate', view: string): void
-}>();
-
+const router = useRouter();
 const store = useShopStore();
 
 const product = ref<Product | null>(null); 
@@ -20,11 +18,9 @@ const selectedQuantity = ref(1);
 
 const loadProductDetail = async () => {
   if (!props.productId) return;
-  
   try {
     const data = await getProductByIdService(props.productId) as Product;
     product.value = data;
-    
     if (product.value?.specs && product.value.specs.length > 0) {
       selectedSpec.value = product.value.specs[0] || '';
     }
@@ -41,6 +37,10 @@ const updateQuantity = (change: number) => {
 };
 
 const addToCart = async () => {
+  if (!store.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: `/product/${props.productId}` } });
+    return;
+  }
   if (product.value) {
     await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
     alert('已成功加入購物車！');
@@ -48,9 +48,13 @@ const addToCart = async () => {
 };
 
 const buyNow = async () => {
+  if (!store.isLoggedIn) {
+    router.push({ name: 'login', query: { redirect: `/product/${props.productId}` } });
+    return;
+  }
   if (product.value) {
     await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
-    emit('navigate', 'cart');
+    router.push('/cart');
   }
 };
 
@@ -119,22 +123,18 @@ onMounted(() => {
           <span class="content-label">預購期間：</span>
           <p class="content-text custom-text-style">{{ product.bookingPeriod }}</p>
         </div>
-
         <div class="content-row" v-if="product.releaseDate">
           <span class="content-label">發售日期：</span>
           <p class="content-text custom-text-style">{{ product.releaseDate }}</p>
         </div>
-
         <div class="content-row" v-if="product.shippingDate">
           <span class="content-label">商品配送：</span>
           <p class="content-text custom-text-style pre-line-style">{{ product.shippingDate }}</p>
         </div>
-
         <div class="content-row" v-if="product.contentDesc">
           <span class="content-label">商品內容：</span>
           <p class="content-text custom-text-style">{{ product.contentDesc }}</p>
         </div>
-
         <div class="content-row" v-if="product.sizeMaterial">
           <span class="content-label">商品規格：</span>
           <p class="content-text custom-text-style pre-line-style">{{ product.sizeMaterial }}</p>
@@ -142,4 +142,5 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <div v-else class="empty-products-text text-center">商品載入中...</div>
 </template>

@@ -1,18 +1,47 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useShopStore } from '../store/shop';
+import { auth } from '../lib/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
-defineProps<{ mode: 'login' | 'register' }>();
-const emit = defineEmits(['auth-action', 'switch-mode']);
+const props = defineProps<{ mode: 'login' | 'register' }>();
+
+const router = useRouter();
+const route = useRoute();
+const store = useShopStore();
 
 const email = ref('');
 const password = ref('');
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!email.value || !password.value) {
     alert('請填寫完整電子信箱與密碼！');
     return;
   }
-  emit('auth-action', { email: email.value, password: password.value });
+  try {
+    if (props.mode === 'register') {
+      await createUserWithEmailAndPassword(auth, email.value, password.value);
+      alert('註冊成功！');
+    } else {
+      await signInWithEmailAndPassword(auth, email.value, password.value);
+      alert('登入成功！');
+    }
+    store.isLoggedIn = true;
+    // 登入後導回原本要去的頁面，或預設到 profile
+    const redirect = route.query.redirect as string | undefined;
+    router.push(redirect || '/profile');
+  } catch (error: any) {
+    if (error.code === 'auth/email-already-in-use') {
+      alert('該電子信箱已被註冊！');
+    } else if (error.code === 'auth/invalid-credential') {
+      alert('電子信箱或密碼錯誤！');
+    } else if (error.code === 'auth/weak-password') {
+      alert('密碼強度不足，請至少輸入 6 個字元！');
+    } else {
+      alert('認證失敗：' + error.message);
+    }
+  }
 };
 </script>
 
@@ -38,9 +67,9 @@ const handleSubmit = () => {
         </div>
 
         <div class="auth-switch-links">
-          <a href="#" @click.prevent="emit('switch-mode')">
+          <RouterLink :to="mode === 'login' ? '/register' : '/login'">
             {{ mode === 'login' ? '還沒有帳號？立即註冊' : '已經有帳號了？返回登入' }}
-          </a>
+          </RouterLink>
         </div>
       </div>
     </div>
