@@ -13,54 +13,68 @@ const currentPage = ref(1);
 const totalPages = ref(1);
 const itemsPerPage = 12;
 
-const pageDocs = ref<(QueryDocumentSnapshot | undefined)[]>([]);
+const lastVisibleDoc = ref<QueryDocumentSnapshot | null>(null);
+const firstVisibleDoc = ref<QueryDocumentSnapshot | null>(null);
+const featuredProducts = ref<any[]>([]);
+
+const loadFeaturedProducts = async () => {
+  try {
+    const q = query(collection(db, 'products'));
+    const querySnapshot = await getDocs(q);
+    const all = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as any[];
+    
+    featuredProducts.value = all.filter(p => p.title && p.title.includes('ヒメヒナミニぬい')).slice(0, 3);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const loadProducts = async () => {
   try {
     const productsRef = collection(db, 'products');
     
-    let q;
-    if (props.searchQuery.trim() !== '') {
-      q = query(productsRef);
-    } else {
-      let orderField = 'createdAt';
-      let orderDirection: 'asc' | 'desc' = 'desc';
+    let orderField = 'createdAt';
+    let orderDirection: 'asc' | 'desc' = 'desc';
 
-      if (sortBy.value === 'price_asc') {
-        orderField = 'price';
-        orderDirection = 'asc';
-      } else if (sortBy.value === 'price_desc') {
-        orderField = 'price';
-        orderDirection = 'desc';
-      }
+    if (sortBy.value === 'price_asc') {
+      orderField = 'price';
+      orderDirection = 'asc';
+    } else if (sortBy.value === 'price_desc') {
+      orderField = 'price';
+      orderDirection = 'desc';
+    }
 
-      if (currentPage.value > 1) {
-        const lastDoc = pageDocs.value[currentPage.value - 2];
-        if (lastDoc) {
-          q = query(
-            productsRef,
-            orderBy(orderField, orderDirection),
-            startAfter(lastDoc),
-            limit(itemsPerPage)
-          );
-        } else {
-          q = query(
-            productsRef,
-            orderBy(orderField, orderDirection),
-            limit(itemsPerPage)
-          );
-        }
-      } else {
+    let q = query(productsRef, orderBy(orderField, orderDirection), limit(itemsPerPage));
+
+    if (props.searchQuery.trim() === '') {
+      const totalSnapshot = await getDocs(collection(db, 'products'));
+      totalPages.value = Math.ceil(totalSnapshot.size / itemsPerPage) || 1;
+      
+      if (currentPage.value > 1 && lastVisibleDoc.value) {
         q = query(
           productsRef,
           orderBy(orderField, orderDirection),
+          startAfter(lastVisibleDoc.value),
           limit(itemsPerPage)
         );
       }
+    } else {
+      q = query(productsRef);
+      totalPages.value = 1;
     }
 
     const querySnapshot = await getDocs(q);
     const allDocs = querySnapshot.docs;
+
+    if (allDocs.length > 0) {
+      firstVisibleDoc.value = allDocs[0] as QueryDocumentSnapshot;
+      lastVisibleDoc.value = allDocs[allDocs.length - 1] as QueryDocumentSnapshot;
+    } else {
+      lastVisibleDoc.value = null;
+    }
 
     let fetchedProducts = allDocs.map(doc => ({
       id: doc.id,
@@ -71,17 +85,6 @@ const loadProducts = async () => {
       fetchedProducts = fetchedProducts.filter(product =>
         product.title?.toLowerCase().includes(props.searchQuery.toLowerCase())
       );
-      totalPages.value = 1;
-    } else {
-      if (currentPage.value === 1 && allDocs.length > 0) {
-        pageDocs.value = [];
-      }
-      if (allDocs.length > 0) {
-        pageDocs.value[currentPage.value - 1] = allDocs[allDocs.length - 1];
-      }
-      
-      const totalSnapshot = await getDocs(collection(db, 'products'));
-      totalPages.value = Math.ceil(totalSnapshot.size / itemsPerPage) || 1;
     }
 
     store.products = fetchedProducts;
@@ -101,45 +104,65 @@ const changePage = (page: number) => {
 
 watch(() => props.searchQuery, () => {
   currentPage.value = 1;
+  lastVisibleDoc.value = null;
   loadProducts();
 });
 
 watch([currentPage, sortBy], () => {
   if (props.searchQuery.trim() === '') {
+    if (currentPage.value === 1) {
+      lastVisibleDoc.value = null;
+    }
     loadProducts();
   }
 });
 
 onMounted(() => {
+  loadFeaturedProducts();
   loadProducts();
 });
 </script>
 
 <template>
-  <div class="home-banner-container">
-    <div class="banner-overlay">
-      <h1 class="banner-title">HIMEHINA OFFICIAL SHOP</h1>
-      <p class="banner-subtitle">田中音樂堂官方周邊販售商城</p>
+  <div class="container main-content home-custom-layout">
+    
+    <div class="featured-top-section" v-if="featuredProducts.length > 0 && !props.searchQuery">
+      <div class="featured-grid">
+        <div 
+          v-for="product in featuredProducts" 
+          :key="'feat-' + product.id" 
+          class="featured-card"
+          @click="emit('navigate', 'detail', product.id)"
+        >
+          <div class="product-img-wrapper">
+            <img :src="product.imageUrl" :alt="product.title" class="product-card-img">
+          </div>
+          <div class="featured-card-info">
+            <h3 class="product-card-title">{{ product.title }}</h3>
+          </div>
+        </div>
+      </div>
+      <hr class="section-divider">
     </div>
-  </div>
 
-  <div class="container main-content">
     <div class="filter-search-row">
+      <div class="section-title custom-title-style">
+        <span class="blue-sq">■</span> 
+        {{ props.searchQuery ? `搜尋結果「${props.searchQuery}」` : '所有商品 ALL PRODUCTS' }}
+      </div>
+      
       <div class="sort-select-wrapper" v-if="!props.searchQuery">
         <select v-model="sortBy" class="sort-dropdown">
-          <option value="date_desc">最新上架</option>
+          <option value="date_desc">最新上架 v</option>
           <option value="price_asc">價格：低到高</option>
           <option value="price_desc">價格：高到低</option>
         </select>
       </div>
     </div>
+    
+    <hr class="section-divider divider-bottom-spacing">
 
-    <div class="section-title">
-      <span class="blue-sq">■</span> 
-      {{ props.searchQuery ? `關鍵字「${props.searchQuery}」的搜尋結果` : '全站商品清單' }}
-    </div>
-
-    <div class="products-grid" v-if="store.products && store.products.length > 0">
+    <div class="products-grid custom-four-columns" v-if="store.products && store.products.length > 0">
       <div 
         v-for="product in store.products" 
         :key="product.id" 

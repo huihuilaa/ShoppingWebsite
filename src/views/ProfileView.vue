@@ -1,123 +1,109 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useShopStore } from '../store/shop';
-import { auth, db } from '../lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
+const props = withDefaults(
+  defineProps<{
+    productId?: string;
+  }>(),
+  {
+    productId: ''
+  }
+);
+const emit = defineEmits(['navigate']);
 
 const store = useShopStore();
-const activeTab = ref<'orders' | 'info'>('info');
-const expandedOrderId = ref<string | null>(null);
+const product = ref<any>(null);
+const loading = ref(true);
+const selectedSpec = ref('');
 
-const name = ref('');
-const address = ref('');
-const phone = ref('');
-
-const emit = defineEmits(['logout']);
-
-const userEmail = computed(() => {
-  return auth.currentUser?.email || '未選取電子郵件';
-});
-
-const toggleOrder = (id: string) => {
-  expandedOrderId.value = expandedOrderId.value === id ? null : id;
-};
-
-const handleLogout = () => {
-  emit('logout');
-};
-
-const fetchUserData = async () => {
-  const user = auth.currentUser;
-  if (!user) return;
-
+const loadProductDetail = async () => {
+  if (!props.productId) return;
+  
   try {
-    const docRef = doc(db, 'users', user.uid);
+    const docRef = doc(db, 'products', props.productId);
     const docSnap = await getDoc(docRef);
+    
     if (docSnap.exists()) {
-      const data = docSnap.data();
-      name.value = data.name || '';
-      address.value = data.address || '';
-      phone.value = data.phone || '';
+      product.value = {
+        id: docSnap.id,
+        ...docSnap.data()
+      };
+      if (product.value.specs && product.value.specs.length > 0) {
+        selectedSpec.value = product.value.specs[0];
+      }
+    } else {
+      console.error('找不到該商品');
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    loading.value = false;
   }
 };
 
-const handleSave = async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    alert('請先登入！');
-    return;
-  }
-
-  try {
-    const docRef = doc(db, 'users', user.uid);
-    await setDoc(docRef, {
-      name: name.value,
-      address: address.value,
-      phone: phone.value,
-      email: user.email
-    }, { merge: true });
-    alert('個人資料儲存成功！');
-  } catch (error) {
-    alert('儲存失敗，請稍後再試！');
-  }
+const handleAddToCart = async () => {
+  if (!product.value) return;
+  await store.addToCart(product.value, selectedSpec.value, 1);
+  emit('navigate', 'cart');
 };
 
 onMounted(() => {
-  fetchUserData();
+  loadProductDetail();
 });
 </script>
 
 <template>
-  <div class="container main-content">
-    <div class="section-title" style="margin-bottom: 20px;">
-      <span class="blue-sq">■</span> 會員中心
-    </div>
-
-    <div class="tab-header">
-      <button class="tab-btn" :class="{ active: activeTab === 'orders' }" @click="activeTab = 'orders'">訂單資訊</button>
-      <button class="tab-btn" :class="{ active: activeTab === 'info' }" @click="activeTab = 'info'">個人資料</button>
-    </div>
-
-    <div v-if="activeTab === 'orders'" class="tab-content">
-      <div v-for="order in store.orders" :key="order.id" class="order-block">
-        <div class="order-row-header" @click="toggleOrder(order.id)">
-          <div class="cell">訂單編號 #{{ order.id }}</div>
-          <div class="cell blue-text font-bold">{{ order.status }}</div>
-          <div class="cell">總額：<span class="pink-text font-bold">NT${{ order.totalPrice }}</span></div>
-          <div class="cell right-align">
-            <button class="detail-toggle-btn" @click.stop="toggleOrder(order.id)">訂單明細</button>
+  <div class="container main-content" v-if="!loading && product">
+    <div class="detail-container">
+      <div class="detail-left">
+        <img :src="product.imageUrl" :alt="product.title" class="detail-img">
+      </div>
+      
+      <div class="detail-right">
+        <h1 class="detail-title">{{ product.title }}</h1>
+        <div class="detail-price">NT${{ product.price }}</div>
+        
+        <div class="detail-spec-section" v-if="product.specs && product.specs.length > 0">
+          <label class="spec-label">規格</label>
+          <div class="spec-options">
+            <button
+              v-for="spec in product.specs"
+              :key="spec"
+              class="spec-btn"
+              :class="{ active: selectedSpec === spec }"
+              @click="selectedSpec = spec"
+            >
+              {{ spec }}
+            </button>
           </div>
         </div>
         
-        <div v-if="expandedOrderId === order.id" class="order-expanded-details">
-          <div v-for="item in order.items" :key="item.title" class="expanded-item-row">
-            <div class="exp-name">
-              {{ item.title }} 
-              <span v-if="item.spec"><small>({{ item.spec }})</small></span>
-            </div>
-            <div class="exp-qty">數量：{{ item.quantity }}</div>
-            <div class="exp-price">NT${{ item.price }}</div>
-            <div class="exp-subtotal pink-text">NT${{ item.price * item.quantity }}</div>
-          </div>
-          <div v-if="order.items.length === 0" class="empty-hint">無明細資料</div>
+        <div class="detail-desc-section" v-if="product.description">
+          <h3 class="desc-title">商品詳情</h3>
+          <p class="desc-content">{{ product.description }}</p>
+        </div>
+        
+        <div class="detail-actions">
+          <button class="pink-btn-rect text-bold" @click="handleAddToCart">
+            加入購物車
+          </button>
+          <button class="secondary-btn-rect text-bold" @click="emit('navigate', 'home')">
+            返回首頁
+          </button>
         </div>
       </div>
     </div>
-
-    <div v-if="activeTab === 'info'" class="tab-content info-container">
-      <div class="form-grid">
-        <div class="form-row"><label>姓名</label><input type="text" v-model="name"></div>
-        <div class="form-row"><label>電子郵件</label><input type="email" :value="userEmail" disabled></div>
-        <div class="form-row"><label>地址</label><input type="text" v-model="address"></div>
-        <div class="form-row"><label>電話號碼</label><input type="text" v-model="phone"></div>
-      </div>
-      <div class="form-action-row">
-        <button class="logout-btn text-bold" @click="handleLogout">登出</button>
-        <button class="pink-btn-rect text-bold" @click="handleSave">儲存</button>
-      </div>
-    </div>
+  </div>
+  
+  <div class="container main-content text-center" v-else-if="loading">
+    <p>商品詳情載入中...</p>
+  </div>
+  
+  <div class="container main-content text-center" v-else>
+    <p>找不到該商品資訊。</p>
+    <button class="pink-btn-rect" @click="emit('navigate', 'home')">返回首頁</button>
   </div>
 </template>

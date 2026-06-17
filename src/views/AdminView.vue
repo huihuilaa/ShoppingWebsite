@@ -1,12 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { db } from '../lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 
 const title = ref('');
 const price = ref(0);
 const imageUrl = ref('');
 const specInput = ref('');
+const description = ref('');
+
+const products = ref<any[]>([]);
+const editingId = ref<string | null>(null);
+
+const loadAdminProducts = async () => {
+  try {
+    const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    products.value = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const handleUpload = async () => {
   if (!title.value || price.value <= 0 || !imageUrl.value) {
@@ -21,31 +38,82 @@ const handleUpload = async () => {
       imageUrl: imageUrl.value,
       status: 'published',
       specs: specInput.value ? specInput.value.split(',').map(s => s.trim()) : [],
+      bookingPeriod: '',
+      releaseDate: '',
+      shippingDate: '',
+      contentDesc: description.value,
+      sizeMaterial: '',
       createdAt: new Date().getTime()
     };
 
-    await addDoc(collection(db, 'products'), productData);
-    alert('商品成功上傳至 Firestore！');
+    if (editingId.value) {
+      const docRef = doc(db, 'products', editingId.value);
+      await updateDoc(docRef, productData);
+      alert('商品更新成功！');
+      editingId.value = null;
+    } else {
+      await addDoc(collection(db, 'products'), productData);
+      alert('商品成功上傳至 Firestore！');
+    }
 
     title.value = '';
     price.value = 0;
     imageUrl.value = '';
     specInput.value = '';
+    description.value = '';
+    
+    await loadAdminProducts();
   } catch (error) {
     console.error(error);
-    alert('上傳失敗，請檢查 Firebase 主控台的安全規則設定。');
+    alert('操作失敗，請檢查權限。');
   }
 };
+
+const startEdit = (product: any) => {
+  editingId.value = product.id;
+  title.value = product.title || '';
+  price.value = product.price || 0;
+  imageUrl.value = product.imageUrl || '';
+  description.value = product.contentDesc || '';
+  specInput.value = product.specs ? product.specs.join(', ') : '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const cancelEdit = () => {
+  editingId.value = null;
+  title.value = '';
+  price.value = 0;
+  imageUrl.value = '';
+  specInput.value = '';
+  description.value = '';
+};
+
+const handleDelete = async (id: string) => {
+  if (!confirm('確定要刪除這項商品嗎？')) return;
+  try {
+    await deleteDoc(doc(db, 'products', id));
+    alert('商品已刪除！');
+    await loadAdminProducts();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(() => {
+  loadAdminProducts();
+});
 </script>
 
 <template>
   <div class="container main-content auth-page-container">
     <div class="auth-card">
-      <h2 class="auth-title">上傳新商品 (管理員後台)</h2>
+      <div class="admin-header-row">
+        <h2 class="auth-title">{{ editingId ? '編輯商品資訊' : '上傳新商品 (管理員後台)' }}</h2>
+      </div>
       
       <div class="auth-form">
         <div class="auth-field">
-          <label>商品名稱</label>
+          <label>商品名稱與別名</label>
           <input type="text" v-model="title">
         </div>
         <div class="auth-field">
@@ -54,17 +122,48 @@ const handleUpload = async () => {
         </div>
         <div class="auth-field">
           <label>圖片路徑或網址</label>
-          <input type="text" v-model="imageUrl" placeholder="例如: /images/logo.png">
+          <input type="text" v-model="imageUrl">
         </div>
         <div class="auth-field">
           <label>商品規格 (多個請用英文逗號隔開)</label>
-          <input type="text" v-model="specInput" placeholder="例如: 豪華盤, 標準盤">
+          <input type="text" v-model="specInput">
+        </div>
+        <div class="auth-field">
+          <label>商品內容詳情說明</label>
+          <textarea v-model="description" rows="5"></textarea>
         </div>
         
-        <div class="auth-action-row">
+        <div class="auth-action-row admin-btn-group">
           <button class="pink-btn-rect text-bold" @click="handleUpload">
-            確認上傳商品
+            {{ editingId ? '確認儲存修改' : '確認上傳商品' }}
           </button>
+          <button v-if="editingId" class="secondary-btn-rect text-bold" @click="cancelEdit">
+            取消編輯
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-card admin-list-card">
+      <h3 class="auth-title admin-list-title">現有商品清單庫存</h3>
+      <div v-if="products.length === 0" class="admin-empty-text">目前資料庫沒有任何商品</div>
+      <div v-else class="admin-list-wrapper">
+        <div 
+          v-for="item in products" 
+          :key="item.id" 
+          class="admin-list-item"
+        >
+          <div class="admin-item-left">
+            <img :src="item.imageUrl" class="admin-item-img">
+            <div>
+              <div class="admin-item-title">{{ item.title }}</div>
+              <div class="admin-item-price">NT${{ item.price }}</div>
+            </div>
+          </div>
+          <div class="admin-item-actions">
+            <button class="secondary-btn-rect admin-action-btn" @click="startEdit(item)">編輯</button>
+            <button class="pink-btn-rect admin-action-btn admin-delete-btn" @click="handleDelete(item.id)">刪除</button>
+          </div>
         </div>
       </div>
     </div>

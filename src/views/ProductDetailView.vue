@@ -1,40 +1,61 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useShopStore } from '../store/shop';
+import { db } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
-const props = defineProps<{
-  productId: string
-}>();
+const props = defineProps<{ productId: string }>();
 
 const emit = defineEmits<{
   (e: 'navigate', view: string): void
 }>();
 
 const store = useShopStore();
+const product = ref<any>(null);
 const selectedSpec = ref('');
 const selectedQuantity = ref(1);
 
-const product = computed(() => {
-  return store.products.find(p => p.id === props.productId);
-});
+const loadProductDetail = async () => {
+  if (!props.productId) return;
+  
+  try {
+    const docRef = doc(db, 'products', props.productId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      product.value = {
+        id: docSnap.id,
+        ...docSnap.data()
+      };
+      
+      if (product.value.specs && product.value.specs.length > 0) {
+        selectedSpec.value = product.value.specs[0] || '';
+      }
+    } else {
+      console.error('找不到該商品');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-if (product.value && product.value.specs && product.value.specs.length > 0) {
-  selectedSpec.value = product.value.specs[0] || '';
-}
-
-const addToCart = () => {
+const addToCart = async () => {
   if (product.value) {
-    store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
+    await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
     alert('已成功加入購物車！');
   }
 };
 
-const buyNow = () => {
+const buyNow = async () => {
   if (product.value) {
-    store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
+    await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
     emit('navigate', 'cart');
   }
 };
+
+onMounted(() => {
+  loadProductDetail();
+});
 </script>
 
 <template>
@@ -46,7 +67,7 @@ const buyNow = () => {
       
       <div class="detail-info">
         <h1 class="detail-title">
-          {{ product.title }} <span class="detail-alias">{{ product.alias }}</span>
+          {{ product.title }} <span class="detail-alias" v-if="product.alias">{{ product.alias }}</span>
         </h1>
         
         <div class="info-row-group">
@@ -82,30 +103,30 @@ const buyNow = () => {
         <span class="blue-sq">■</span>商品資訊 <span class="en">PRODUCT INFO</span>
       </div>
       
-      <div class="info-content-box">
+      <div class="info-content-box custom-info-box">
         <div class="content-row" v-if="product.bookingPeriod">
           <span class="content-label">預購期間：</span>
-          <p class="content-text">{{ product.bookingPeriod }}</p>
+          <p class="content-text custom-text-style">{{ product.bookingPeriod }}</p>
         </div>
 
         <div class="content-row" v-if="product.releaseDate">
           <span class="content-label">發售日期：</span>
-          <p class="content-text">{{ product.releaseDate }}</p>
+          <p class="content-text custom-text-style">{{ product.releaseDate }}</p>
         </div>
 
         <div class="content-row" v-if="product.shippingDate">
           <span class="content-label">商品配送：</span>
-          <p class="content-text">{{ product.shippingDate }}</p>
+          <p class="content-text custom-text-style pre-line-style">{{ product.shippingDate }}</p>
         </div>
 
         <div class="content-row" v-if="product.contentDesc">
           <span class="content-label">商品內容：</span>
-          <p class="content-text">{{ product.contentDesc }}</p>
+          <p class="content-text custom-text-style">{{ product.contentDesc }}</p>
         </div>
 
         <div class="content-row" v-if="product.sizeMaterial">
           <span class="content-label">商品規格：</span>
-          <p class="content-text">{{ product.sizeMaterial }}</p>
+          <p class="content-text custom-text-style pre-line-style">{{ product.sizeMaterial }}</p>
         </div>
       </div>
     </div>
