@@ -9,10 +9,10 @@ import ProductDetailView from './views/ProductDetailView.vue';
 import CartView from './views/CartView.vue';
 import ProfileView from './views/ProfileView.vue';
 import AuthView from './views/AuthView.vue';
-import AdminView from './views/AdminView.vue'; // 1. 引入管理員後台
+import AdminView from './views/AdminView.vue';
 
 const store = useShopStore();
-const currentView = ref('home'); // 如果你想開網頁直接看後台，可以先把這行改成 ref('admin')
+const currentView = ref('home');
 const selectedProductId = ref<string | null>(null);
 
 const handleNavigate = (view: string, id?: string) => {
