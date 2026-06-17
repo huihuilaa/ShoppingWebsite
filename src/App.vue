@@ -14,6 +14,7 @@ import AdminView from './views/AdminView.vue';
 const store = useShopStore();
 const currentView = ref('home');
 const selectedProductId = ref<string | null>(null);
+const currentProductId = ref('');
 
 const handleNavigate = (view: string, id?: string) => {
   if (view === 'profile' && !store.isLoggedIn) {
@@ -89,7 +90,7 @@ const handleNavbarSearch = () => {
     <HomeView v-if="currentView === 'home'" :search-query="searchQuery" @navigate="handleNavigate"@clear-search="searchQuery = ''" />
     <ProductDetailView v-if="currentView === 'detail'" :product-id="selectedProductId || ''" @navigate="handleNavigate" />
     <CartView v-if="currentView === 'cart'" @navigate="handleNavigate" />
-    <ProfileView v-if="currentView === 'profile'" @navigate="handleNavigate" @logout="store.isLoggedIn = false; handleNavigate('home')" />
+    <ProfileView v-if="currentView === 'profile'" :product-id="currentProductId" @navigate="handleNavigate" @logout="store.isLoggedIn = false; handleNavigate('home')" />
     
     <AuthView v-if="currentView === 'login'" mode="login" @auth-action="(data) => handleAuth('login', data)" @switch-mode="currentView = 'register'" />
     <AuthView v-if="currentView === 'register'" mode="register" @auth-action="(data) => handleAuth('register', data)" @switch-mode="currentView = 'login'" />

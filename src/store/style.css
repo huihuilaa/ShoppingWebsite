@@ -1514,3 +1514,143 @@ button:focus-visible {
   color: #ff66a3;
   border-color: #ff66a3;
 }
+
+.detail-info .info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px; 
+}
+
+.detail-info .info-row.align-start {
+  align-items: flex-start;
+}
+
+.info-label {
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+
+.btn-label-pad {
+  padding-top: 6px;
+}
+
+.detail-spec-buttons-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+}
+
+.detail-info .info-row .detail-spec-buttons-wrap button.spec-select-btn {
+  background-color: #f0f6fc;
+  border: 1px solid #5ea6e4;
+  color: #5ea6e4;
+  font-size: 0.95rem;
+  font-weight: bold;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+  margin: 0;
+  width: auto;
+  height: auto;
+}
+
+.detail-info .info-row .detail-spec-buttons-wrap button.spec-select-btn:hover {
+  background-color: #e1eefc;
+}
+
+.detail-info .info-row .detail-spec-buttons-wrap button.spec-select-btn.active {
+  background-color: #ff66a3;
+  border: 1px solid #ff66a3;
+  color: #ffffff;
+}
+
+.detail-info .info-row .quantity-counter-box {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #5ea6e4;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #ffffff;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+.detail-info .info-row .quantity-counter-box button {
+  background-color: #ffffff;
+  border: none;
+  color: #5ea6e4;
+  font-size: 1.1rem;
+  font-weight: bold;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.detail-info .info-row .quantity-counter-box button:hover:not(:disabled) {
+  background-color: #f0f6fc;
+}
+
+.detail-info .info-row .quantity-counter-box button:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+  background-color: #ffffff;
+}
+
+.detail-info .info-row .quantity-counter-box .qty-number-display {
+  width: 36px;
+  min-width: 36px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  border-left: 1px solid #5ea6e4;
+  border-right: 1px solid #5ea6e4;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.detail-info .detail-action-margin {
+  margin-top: 35px;
+}
+
+.detail-info button.pink-btn-rect.btn-detail-add-cart {
+  background-color: #ffffff;
+  border: 1px solid #5ea6e4;
+  color: #5ea6e4;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: background-color 0.2s;
+  outline: none;
+}
+
+.detail-info button.pink-btn-rect.btn-detail-add-cart:hover {
+  background-color: #f0f6fc;
+}

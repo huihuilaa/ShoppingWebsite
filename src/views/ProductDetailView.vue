@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useShopStore } from '../store/shop';
-import { db } from '../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { getProductByIdService } from '../api/products';
+import type { Product } from '../types'; 
 
-const props = defineProps<{ productId: string }>();
+const props = defineProps<{ 
+  productId: string 
+}>();
 
 const emit = defineEmits<{
   (e: 'navigate', view: string): void
 }>();
 
 const store = useShopStore();
-const product = ref<any>(null);
+
+const product = ref<Product | null>(null); 
 const selectedSpec = ref('');
 const selectedQuantity = ref(1);
 
@@ -19,23 +22,21 @@ const loadProductDetail = async () => {
   if (!props.productId) return;
   
   try {
-    const docRef = doc(db, 'products', props.productId);
-    const docSnap = await getDoc(docRef);
+    const data = await getProductByIdService(props.productId) as Product;
+    product.value = data;
     
-    if (docSnap.exists()) {
-      product.value = {
-        id: docSnap.id,
-        ...docSnap.data()
-      };
-      
-      if (product.value.specs && product.value.specs.length > 0) {
-        selectedSpec.value = product.value.specs[0] || '';
-      }
-    } else {
-      console.error('找不到該商品');
+    if (product.value?.specs && product.value.specs.length > 0) {
+      selectedSpec.value = product.value.specs[0] || '';
     }
   } catch (error) {
-    console.error(error);
+    console.error('載入商品詳情失敗:', error);
+  }
+};
+
+const updateQuantity = (change: number) => {
+  const newQty = selectedQuantity.value + change;
+  if (newQty >= 1 && newQty <= 10) {
+    selectedQuantity.value = newQty;
   }
 };
 
@@ -76,23 +77,33 @@ onMounted(() => {
             <span class="detail-price">NT${{ product.price }}</span>
           </div>
           
-          <div class="info-row" v-if="product.specs && product.specs.length > 0">
-            <span class="info-label">規格：</span>
-            <select v-model="selectedSpec" class="detail-select">
-              <option v-for="spec in product.specs" :key="spec" :value="spec">{{ spec }}</option>
-            </select>
+          <div class="info-row align-start" v-if="product.specs && product.specs.length > 0">
+            <span class="info-label btn-label-pad">規格：</span>
+            <div class="detail-spec-buttons-wrap">
+              <button
+                v-for="spec in product.specs"
+                :key="spec"
+                class="spec-select-btn"
+                :class="{ active: selectedSpec === spec }"
+                @click="selectedSpec = spec"
+              >
+                {{ spec }}
+              </button>
+            </div>
           </div>
 
           <div class="info-row">
             <span class="info-label">數量：</span>
-            <select v-model="selectedQuantity" class="detail-select quantity-select">
-              <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
-            </select>
+            <div class="quantity-counter-box">
+              <button class="qty-btn" @click="updateQuantity(-1)" :disabled="selectedQuantity <= 1">-</button>
+              <span class="qty-number-display">{{ selectedQuantity }}</span>
+              <button class="qty-btn" @click="updateQuantity(1)" :disabled="selectedQuantity >= 10">+</button>
+            </div>
           </div>
         </div>
         
-        <div class="action-group">
-          <button class="btn-add-cart" @click="addToCart">加入購物車</button>
+        <div class="action-group detail-action-margin">
+          <button class="pink-btn-rect text-bold btn-detail-add-cart" @click="addToCart">加入購物車</button>
           <button class="btn-buy-now" @click="buyNow">立即購買</button>
         </div>
       </div>
