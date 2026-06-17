@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useShopStore } from './store/shop';
+import { auth } from '../src/lib/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+
 import HomeView from './views/HomeView.vue';
-import DetailView from './views/ProductDetailView.vue';
+import ProductDetailView from './views/ProductDetailView.vue';
 import CartView from './views/CartView.vue';
 import ProfileView from './views/ProfileView.vue';
 import AuthView from './views/AuthView.vue';
@@ -16,10 +19,33 @@ const handleNavigate = (view: string, id?: string) => {
     currentView.value = 'login';
     return;
   }
-  
   currentView.value = view;
   if (id) {
     selectedProductId.value = id;
+  }
+};
+
+const handleAuth = async (mode: 'login' | 'register', data: any) => {
+  try {
+    if (mode === 'register') {
+      await createUserWithEmailAndPassword(auth, data.email, data.password);
+      alert('註冊成功！');
+    } else {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      alert('登入成功！');
+    }
+    store.isLoggedIn = true;
+    handleNavigate('profile');
+  } catch (error: any) {
+    if (error.code === 'auth/email-already-in-use') {
+      alert('該電子信箱已被註冊！');
+    } else if (error.code === 'auth/invalid-credential') {
+      alert('電子信箱或密碼錯誤！');
+    } else if (error.code === 'auth/weak-password') {
+      alert('密碼強度不足，請至少輸入 6 個字元！');
+    } else {
+      alert('認證失敗：' + error.message);
+    }
   }
 };
 </script>
@@ -45,13 +71,12 @@ const handleNavigate = (view: string, id?: string) => {
 
   <main class="main-content">
     <HomeView v-if="currentView === 'home'" @navigate="handleNavigate" />
-    <ProductDetailView v-if="currentView === 'detail'" :id="selectedProductId" @navigate="handleNavigate" />
+    <ProductDetailView v-if="currentView === 'detail'" :product-id="selectedProductId || ''" @navigate="handleNavigate" />
     <CartView v-if="currentView === 'cart'" @navigate="handleNavigate" />
-    
     <ProfileView v-if="currentView === 'profile'" @navigate="handleNavigate" @logout="store.isLoggedIn = false; handleNavigate('home')" />
     
-    <AuthView v-if="currentView === 'login'" mode="login" @login-success="store.isLoggedIn = true; handleNavigate('profile')" />
-    <AuthView v-if="currentView === 'register'" mode="register" @login-success="store.isLoggedIn = true; handleNavigate('profile')" />
+    <AuthView v-if="currentView === 'login'" mode="login" @auth-action="(data) => handleAuth('login', data)" @switch-mode="currentView = 'register'" />
+    <AuthView v-if="currentView === 'register'" mode="register" @auth-action="(data) => handleAuth('register', data)" @switch-mode="currentView = 'login'" />
   </main>
 
   <footer class="footer">

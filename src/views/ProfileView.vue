@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useShopStore } from '../store/shop';
+import { auth, db } from '../lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const store = useShopStore();
-const activeTab = ref<'orders' | 'info'>('orders');
+const activeTab = ref<'orders' | 'info'>('info');
 const expandedOrderId = ref<string | null>(null);
 
+const name = ref('');
+const address = ref('');
+const phone = ref('');
+
 const emit = defineEmits(['logout']);
+
+const userEmail = computed(() => {
+  return auth.currentUser?.email || '未選取電子郵件';
+});
 
 const toggleOrder = (id: string) => {
   expandedOrderId.value = expandedOrderId.value === id ? null : id;
@@ -15,6 +25,49 @@ const toggleOrder = (id: string) => {
 const handleLogout = () => {
   emit('logout');
 };
+
+const fetchUserData = async () => {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    const docRef = doc(db, 'users', user.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      name.value = data.name || '';
+      address.value = data.address || '';
+      phone.value = data.phone || '';
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const handleSave = async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    alert('請先登入！');
+    return;
+  }
+
+  try {
+    const docRef = doc(db, 'users', user.uid);
+    await setDoc(docRef, {
+      name: name.value,
+      address: address.value,
+      phone: phone.value,
+      email: user.email
+    }, { merge: true });
+    alert('個人資料儲存成功！');
+  } catch (error) {
+    alert('儲存失敗，請稍後再試！');
+  }
+};
+
+onMounted(() => {
+  fetchUserData();
+});
 </script>
 
 <template>
@@ -56,14 +109,14 @@ const handleLogout = () => {
 
     <div v-if="activeTab === 'info'" class="tab-content info-container">
       <div class="form-grid">
-        <div class="form-row"><label>姓名</label><input type="text" value=""></div>
-        <div class="form-row"><label>電子郵件</label><input type="email" value="" disabled></div>
-        <div class="form-row"><label>地址</label><input type="text" value=""></div>
-        <div class="form-row"><label>電話號碼</label><input type="text" value=""></div>
+        <div class="form-row"><label>姓名</label><input type="text" v-model="name"></div>
+        <div class="form-row"><label>電子郵件</label><input type="email" :value="userEmail" disabled></div>
+        <div class="form-row"><label>地址</label><input type="text" v-model="address"></div>
+        <div class="form-row"><label>電話號碼</label><input type="text" v-model="phone"></div>
       </div>
       <div class="form-action-row">
         <button class="logout-btn text-bold" @click="handleLogout">登出</button>
-        <button class="pink-btn-rect text-bold" style="width: 120px;">儲存</button>
+        <button class="pink-btn-rect text-bold" @click="handleSave">儲存</button>
       </div>
     </div>
   </div>

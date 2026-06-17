@@ -1086,3 +1086,20 @@ button:focus-visible {
   background-color: #F0F4F8;
   font-size: 0.9rem;
 }
+
+.auth-switch-links {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.auth-switch-links a {
+  color: #767676;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.auth-switch-links a:hover {
+  color: #ff66a3;
+}
