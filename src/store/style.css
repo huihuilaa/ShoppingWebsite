@@ -1667,7 +1667,7 @@ button:focus-visible {
 .detail-info button.pink-btn-rect.btn-detail-add-cart:hover {
   background-color: #f0f6fc;
 }
-/* ===== 分頁 ===== */
+
 .pagination-wrap {
   display: flex;
   justify-content: center;
