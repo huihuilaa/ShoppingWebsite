@@ -1641,3 +1641,730 @@ button:focus-visible {
 .pre-line-style {
   white-space: pre-line;
 }
+
+.cart-custom-page {
+  max-width: 1000px;
+  margin: 40px auto 0 auto;
+  padding: 0 20px;
+}
+
+.cart-header-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1a252f;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.cart-header-title .blue-sq {
+  color: #3498db;
+  margin-right: 8px;
+}
+
+.cart-container-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.cart-items-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cart-row-card-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.cart-checkbox-outside {
+  padding-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-custom-checkbox {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  border: 1px solid #3498db;
+  border-radius: 4px;
+}
+
+.cart-main-info-card {
+  flex: 1;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cart-item-name-col {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2c3e50;
+  flex: 2;
+  text-align: left;
+}
+
+.cart-item-price-col {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #2c3e50;
+  flex: 1;
+  text-align: center;
+}
+
+.cart-item-qty-col {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.cart-card-select {
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  padding: 6px 20px;
+  font-size: 1rem;
+  color: #2c3e50;
+  border-radius: 4px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.cart-item-action-col {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cart-card-delete-btn {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #718096;
+  font-size: 1.05rem;
+  font-weight: bold;
+  padding: 10px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cart-card-delete-btn:hover {
+  background-color: #edf2f7;
+  color: #2c3e50;
+}
+
+.cart-summary-panel-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.summary-total-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.summary-total-label {
+  font-size: 1.1rem;
+  color: #4a5568;
+}
+
+.summary-total-price {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #e53e3e;
+}
+
+.checkout-action-btn {
+  padding: 12px 40px;
+  font-size: 1.1rem;
+}
+
+/* 新增/修改結帳與購物車版面樣式 */
+.cart-two-columns-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.cart-main-items-col {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cart-summary-sidebar-col {
+  flex: 1;
+  position: sticky;
+  top: 100px;
+}
+
+.checkout-detail-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 30px;
+}
+
+.checkout-card-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.summary-line .label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.summary-line .value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.shipping-fee-text {
+  color: #7f8c8d !important;
+}
+
+.summary-hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 20px 0;
+}
+
+.final-total-row {
+  margin-bottom: 30px;
+}
+
+.total-price-red {
+  color: #ff66a3 !important;
+  font-size: 1.4rem !important;
+}
+
+.checkout-submit-btn {
+  width: 100%;
+  padding: 12px 0;
+  font-size: 1.2rem;
+  border-radius: 4px;
+}
+
+/* 修正左側卡片內的文字樣式 */
+.cart-main-info-card {
+  padding: 15px 25px;
+}
+
+.cart-item-name-col, .cart-item-price-col {
+  font-size: 1.05rem;
+  color: #2c3e50;
+}
+
+.cart-empty-text-line {
+  display: block;
+  width: 100%;
+  font-size: 1.1rem;
+  color: #a0aec0;
+  padding: 30px 0;
+  text-align: left;
+}
+
+.cart-empty-text-line .pink-btn-rect {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.profile-page-container {
+  max-width: 1000px;
+  margin: 40px auto 0 auto;
+  padding: 0 20px;
+}
+
+.profile-tab-page {
+  max-width: 900px;
+  margin: 40px auto 0 auto;
+  padding: 0 20px;
+}
+
+.profile-tabs-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #cbd5e1;
+  position: relative;
+  z-index: 1;
+}
+
+.tab-nav-btn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-bottom: none;
+  padding: 10px 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #64748b;
+  cursor: pointer;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.tab-nav-btn.active {
+  color: #1e293b;
+  border-color: #cbd5e1;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 9px;
+  background-color: #ffffff;
+}
+
+.profile-tab-content-box {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-top: none;
+  padding: 40px;
+  min-height: 350px;
+}
+
+.orders-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-row-item-bar {
+  background-color: #f8fafc;
+  border-radius: 4px;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.order-bar-id {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #1e293b;
+  flex: 1.5;
+}
+
+.order-bar-status {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #3498db;
+  flex: 1;
+  text-align: center;
+}
+
+.order-bar-total {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #1e293b;
+  flex: 1.5;
+  text-align: center;
+}
+
+.pink-price {
+  color: #ff66a3;
+}
+
+.order-bar-action {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-order-detail {
+  background-color: #ffffff;
+  border: 1px solid #3498db;
+  color: #3498db;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-order-detail:hover {
+  background-color: #f0f9ff;
+}
+
+.info-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.form-row-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.form-field-line {
+  display: flex;
+  align-items: center;
+}
+
+.form-label-text {
+  width: 100px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #1e293b;
+  text-align: right;
+  padding-right: 24px;
+}
+
+.form-input-box {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  padding: 10px 14px;
+  font-size: 1rem;
+  border-radius: 4px;
+  color: #334155;
+  outline: none;
+}
+
+.form-input-box:focus {
+  border-color: #3498db;
+}
+
+.form-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 40px;
+}
+
+.btn-profile-save {
+  padding: 10px 36px;
+  font-size: 1.1rem;
+}
+
+/* Added/updated profile page styles (from user) */
+.profile-page-wrapper {
+  width: 100%;
+  background-color: #f8fafc;
+  padding: 60px 0 100px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-tab-container {
+  width: 100%;
+  max-width: 960px;
+  padding: 0 24px;
+}
+
+.profile-header-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 35px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 1px;
+}
+
+.profile-header-title .blue-sq {
+  color: #3b82f6;
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.profile-tabs-nav {
+  display: flex;
+  position: relative;
+  top: 1px;
+  z-index: 2;
+}
+
+.tab-nav-btn {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 12px 36px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.tab-nav-btn.active {
+  color: #1e293b;
+  border-color: #cbd5e1;
+  border-bottom: 3px solid #3b82f6;
+  padding-bottom: 11px;
+  background-color: #ffffff;
+}
+
+.profile-tab-content-card {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 30px;
+  min-height: 450px;
+  border-radius: 0 4px 4px 4px;
+}
+
+.orders-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-accordion-group {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.order-list-row-item {
+  background-color: #f8fafc;
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.order-col-id {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #334155;
+  flex: 1.5;
+}
+
+.order-col-status {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #3b82f6;
+  flex: 1;
+  text-align: center;
+}
+
+.order-col-total {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #334155;
+  flex: 1.5;
+  text-align: center;
+}
+
+.pink-total-text {
+  color: #ff66a3;
+  font-size: 1.25rem;
+}
+
+.order-col-action {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-order-detail-outline {
+  background-color: #ffffff;
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-order-detail-outline:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* 下抽手風琴明細動畫面板 */
+.order-expanded-detail-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: #f1f5f9;
+}
+
+.order-expanded-detail-panel.is-open {
+  max-height: 300px;
+}
+
+.expanded-inner-box {
+  padding: 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inner-product-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.05rem;
+  color: #475569;
+  padding: 8px 0;
+}
+
+.p-title-spec {
+  flex: 2;
+  font-weight: bold;
+  color: #334155;
+}
+
+.p-spec-hint {
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.p-qty {
+  flex: 1;
+  text-align: center;
+}
+
+.p-single-price {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+}
+
+.p-subtotal {
+  flex: 1;
+  text-align: right;
+  font-weight: bold;
+  color: #ff66a3;
+}
+
+/* 個人資料表單佈局 */
+.info-form-layout {
+  padding: 20px 10px;
+}
+
+.form-fields-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 520px;
+}
+
+.form-input-group-row {
+  display: flex;
+  align-items: center;
+}
+
+.form-input-label {
+  width: 100px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #334155;
+  text-align: right;
+  padding-right: 30px;
+}
+
+.form-clean-input {
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  padding: 10px 16px;
+  font-size: 1.05rem;
+  border-radius: 4px;
+  color: #334155;
+  outline: none;
+}
+
+.form-action-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 60px;
+}
+
+.btn-submit-profile {
+  background-color: #ff66a3;
+  color: #ffffff;
+  border: none;
+  padding: 12px 40px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 102, 163, 0.2);
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.btn-submit-profile:hover {
+  background-color: #ff4d94;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 102, 163, 0.3);
+}
+
+.btn-submit-profile:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 102, 163, 0.2);
+}
+
+.profile-loading-text, .profile-empty-orders {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 60px 0;
+}
+
+.form-action-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 60px;
+}
+
+.btn-profile-logout {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  padding: 12px 40px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.btn-profile-logout:hover {
+  background-color: #f8fafc;
+  color: #ff66a3;
+  border-color: #ff66a3;
+}

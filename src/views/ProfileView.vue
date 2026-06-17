@@ -1,42 +1,44 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useShopStore } from '../store/shop';
-import { db } from '../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../lib/firebase';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 
-const props = withDefaults(
-  defineProps<{
-    productId?: string;
-  }>(),
-  {
-    productId: ''
-  }
-);
-const emit = defineEmits(['navigate']);
+const emit = defineEmits<{
+  (e: 'navigate', view: string): void
+}>();
 
-const store = useShopStore();
-const product = ref<any>(null);
+const activeTab = ref('orders');
+const orders = ref<any[]>([]);
 const loading = ref(true);
-const selectedSpec = ref('');
+const expandedOrderId = ref<string | null>(null);
 
-const loadProductDetail = async () => {
-  if (!props.productId) return;
-  
+const profileForm = ref({
+  name: '',
+  email: '',
+  address: '',
+  phone: ''
+});
+
+const loadUserOrders = async () => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    loading.value = false;
+    emit('navigate', 'home');
+    return;
+  }
+
+  profileForm.value.email = currentUser.email || '';
+
   try {
-    const docRef = doc(db, 'products', props.productId);
-    const docSnap = await getDoc(docRef);
+    loading.value = true;
+    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
     
-    if (docSnap.exists()) {
-      product.value = {
-        id: docSnap.id,
-        ...docSnap.data()
-      };
-      if (product.value.specs && product.value.specs.length > 0) {
-        selectedSpec.value = product.value.specs[0];
-      }
-    } else {
-      console.error('找不到該商品');
-    }
+    orders.value = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
   } catch (error) {
     console.error(error);
   } finally {
@@ -44,66 +46,153 @@ const loadProductDetail = async () => {
   }
 };
 
-const handleAddToCart = async () => {
-  if (!product.value) return;
-  await store.addToCart(product.value, selectedSpec.value, 1);
-  emit('navigate', 'cart');
+const toggleOrderDetail = (orderId: string) => {
+  if (expandedOrderId.value === orderId) {
+    expandedOrderId.value = null;
+  } else {
+    expandedOrderId.value = orderId;
+  }
+};
+
+const handleSaveProfile = () => {
+  window.alert('個人資料儲存成功！');
+};
+
+const handleLogout = async () => {
+  if (!confirm('確定要登出系統嗎？')) return;
+  try {
+    await signOut(auth);
+    window.alert('已成功登出會員系統！');
+    emit('navigate', 'home');
+  } catch (error) {
+    console.error('登出失敗：', error);
+  }
 };
 
 onMounted(() => {
-  loadProductDetail();
+  loadUserOrders();
 });
 </script>
 
 <template>
-  <div class="container main-content" v-if="!loading && product">
-    <div class="detail-container">
-      <div class="detail-left">
-        <img :src="product.imageUrl" :alt="product.title" class="detail-img">
+  <div class="profile-page-wrapper">
+    <div class="profile-tab-container">
+      <div class="profile-header-title">
+        <span class="blue-sq">■</span> 會員中心
       </div>
-      
-      <div class="detail-right">
-        <h1 class="detail-title">{{ product.title }}</h1>
-        <div class="detail-price">NT${{ product.price }}</div>
-        
-        <div class="detail-spec-section" v-if="product.specs && product.specs.length > 0">
-          <label class="spec-label">規格</label>
-          <div class="spec-options">
-            <button
-              v-for="spec in product.specs"
-              :key="spec"
-              class="spec-btn"
-              :class="{ active: selectedSpec === spec }"
-              @click="selectedSpec = spec"
+
+      <div class="profile-tabs-nav">
+        <button 
+          class="tab-nav-btn" 
+          :class="{ active: activeTab === 'orders' }" 
+          @click="activeTab = 'orders'"
+        >
+          訂單資訊
+        </button>
+        <button 
+          class="tab-nav-btn" 
+          :class="{ active: activeTab === 'info' }" 
+          @click="activeTab = 'info'"
+        >
+          個人資料
+        </button>
+      </div>
+
+      <div class="profile-tab-content-card">
+        <div v-if="activeTab === 'orders'" class="tab-pane-view">
+          <div v-if="loading" class="profile-loading-text">
+            訂單資料載入中...
+          </div>
+          
+          <div v-else-if="orders.length === 0" class="profile-empty-orders">
+            目前沒有任何歷史訂單紀錄。
+          </div>
+
+          <div v-else class="orders-accordion-list">
+            <div 
+              v-for="order in orders" 
+              :key="order.id" 
+              class="order-accordion-group"
             >
-              {{ spec }}
+              <div class="order-list-row-item">
+                <div class="order-col-id">
+                  訂單編號 #{{ order.orderId }}
+                </div>
+                <div class="order-col-status">
+                  {{ order.status || '已付款' }}
+                </div>
+                <div class="order-col-total">
+                  總額：<span class="pink-total-text">NT${{ order.totalAmount }}</span>
+                </div>
+                <div class="order-col-action">
+                  <button class="btn-order-detail-outline" @click="toggleOrderDetail(order.orderId)">
+                    訂單明細
+                  </button>
+                </div>
+              </div>
+
+              <div 
+                class="order-expanded-detail-panel"
+                :class="{ 'is-open': expandedOrderId === order.orderId }"
+              >
+                <div class="expanded-inner-box">
+                  <div 
+                    v-for="(item, idx) in order.items" 
+                    :key="idx" 
+                    class="inner-product-row"
+                  >
+                    <div class="p-title-spec">
+                      {{ item.title }} <span class="p-spec-hint" v-if="item.selectedSpec && item.selectedSpec !== '標準款'">({{ item.selectedSpec }})</span>
+                    </div>
+                    <div class="p-qty">
+                      數量：{{ item.quantity }}
+                    </div>
+                    <div class="p-single-price">
+                      NT${{ item.price }}
+                    </div>
+                    <div class="p-subtotal">
+                      NT${{ Number(item.price) * Number(item.quantity) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="activeTab === 'info'" class="tab-pane-view info-form-layout">
+          <div class="form-fields-column">
+            <div class="form-input-group-row">
+              <label class="form-input-label">姓名</label>
+              <input type="text" v-model="profileForm.name" class="form-clean-input">
+            </div>
+            
+            <div class="form-input-group-row">
+              <label class="form-input-label">電子郵件</label>
+              <input type="email" v-model="profileForm.email" class="form-clean-input">
+            </div>
+            
+            <div class="form-input-group-row">
+              <label class="form-input-label">地址</label>
+              <input type="text" v-model="profileForm.address" class="form-clean-input">
+            </div>
+            
+            <div class="form-input-group-row">
+              <label class="form-input-label">電話號碼</label>
+              <input type="text" v-model="profileForm.phone" class="form-clean-input">
+            </div>
+          </div>
+
+          <div class="form-action-btn-row">
+            <button class="btn-profile-logout" @click="handleLogout">
+              登出
+            </button>
+            <button class="pink-btn-rect text-bold btn-submit-profile" @click="handleSaveProfile">
+              儲存
             </button>
           </div>
         </div>
-        
-        <div class="detail-desc-section" v-if="product.description">
-          <h3 class="desc-title">商品詳情</h3>
-          <p class="desc-content">{{ product.description }}</p>
-        </div>
-        
-        <div class="detail-actions">
-          <button class="pink-btn-rect text-bold" @click="handleAddToCart">
-            加入購物車
-          </button>
-          <button class="secondary-btn-rect text-bold" @click="emit('navigate', 'home')">
-            返回首頁
-          </button>
-        </div>
       </div>
     </div>
-  </div>
-  
-  <div class="container main-content text-center" v-else-if="loading">
-    <p>商品詳情載入中...</p>
-  </div>
-  
-  <div class="container main-content text-center" v-else>
-    <p>找不到該商品資訊。</p>
-    <button class="pink-btn-rect" @click="emit('navigate', 'home')">返回首頁</button>
   </div>
 </template>

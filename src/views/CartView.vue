@@ -1,69 +1,143 @@
 <script setup lang="ts">
-import { useShopStore } from '../store/shop';
+import { ref, onMounted, computed } from 'vue';
+import { db } from '../lib/firebase';
+import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 
-const emit = defineEmits(['navigate']);
-const store = useShopStore();
+const emit = defineEmits<{
+  (e: 'navigate', view: string): void
+}>();
 
-const shouldShowAlias = (title: string) => {
-  return /ver\./i.test(title);
+const cartItems = ref<any[]>([]);
+const shippingFee = ref(50);
+
+const loadCartItems = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'carts'));
+    cartItems.value = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-const handleCheckout = () => {
-  if (store.cartSubtotal === 0) {
-    alert('請至少勾選一項商品進行結帳！');
-    return;
+const updateQuantity = async (item: any, newQty: number) => {
+  try {
+    const docRef = doc(db, 'carts', item.id);
+    await updateDoc(docRef, { quantity: Number(newQty) });
+    item.quantity = Number(newQty);
+  } catch (error) {
+    console.error(error);
   }
-  
-  if (!store.isLoggedIn) {
-    alert('請先登入會員再進行結帳！');
-    emit('navigate', 'login');
-    return;
-  }
-  
-  emit('navigate', 'profile');
 };
+
+const toggleCheck = async (item: any) => {
+  try {
+    const docRef = doc(db, 'carts', item.id);
+    await updateDoc(docRef, { checked: !item.checked });
+    item.checked = !item.checked;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const removeCartItem = async (id: string) => {
+  if (!confirm('確定要將此商品從購物車中移除嗎？')) return;
+  try {
+    await deleteDoc(doc(db, 'carts', id));
+    cartItems.value = cartItems.value.filter(item => item.id !== id);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const subtotal = computed(() => {
+  return cartItems.value
+    .filter(item => item.checked)
+    .reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
+});
+
+const finalTotal = computed(() => {
+  return subtotal.value > 0 ? subtotal.value + shippingFee.value : 0;
+});
+
+onMounted(() => {
+  loadCartItems();
+});
 </script>
 
 <template>
-  <div class="container main-content">
-    <div class="section-title" style="margin-bottom: 20px;">
+  <div class="container main-content cart-page-container">
+    <div class="cart-header-title">
       <span class="blue-sq">■</span> 購物車
     </div>
-
-    <div class="cart-split-layout">
-      <div class="cart-left-list">
-        <div v-for="item in store.cartItems" :key="item.id" class="cart-item-row">
-          <input type="checkbox" v-model="item.checked" class="cart-checkbox">
-          <div class="cart-item-name">
-            {{ item.product.title }}
-            <span v-if="item.product.alias && shouldShowAlias(item.product.title)"> {{ item.product.alias }}</span>
-            <small>({{ item.selectedSpec }})</small>
-          </div>
-          <div class="cart-item-price">NT${{ item.product.price }}</div>
-          <div class="cart-item-qty">
-            <input type="number" v-model.number="item.quantity" min="1" class="cart-qty-input">
-          </div>
-          <div class="cart-item-action" @click="store.removeFromCart(item.id)">刪除</div>
+    
+    <div class="cart-two-columns-layout">
+      <div class="cart-main-items-col">
+        <div v-if="cartItems.length === 0" class="cart-empty-text-line">
+          <span>購物車是空的</span>
         </div>
-        <div v-if="store.cartItems.length === 0" class="empty-cart-hint">購物車空空如也...</div>
+
+        <div v-else class="cart-items-list-inner">
+          <div 
+            v-for="item in cartItems" 
+            :key="item.id" 
+            class="cart-row-card-item"
+          >
+            <div class="cart-checkbox-outside">
+              <input 
+                type="checkbox" 
+                :checked="item.checked" 
+                @change="toggleCheck(item)"
+                class="cart-custom-checkbox"
+              >
+            </div>
+            
+            <div class="cart-main-info-card">
+              <div class="cart-item-name-col">{{ item.title }}</div>
+              <div class="cart-item-price-col">NT${{ item.price }}</div>
+              <div class="cart-item-qty-col">
+                <select 
+                  :value="item.quantity" 
+                  @change="updateQuantity(item, Number(($event.target as HTMLSelectElement).value))"
+                  class="cart-card-select"
+                >
+                  <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
+                </select>
+              </div>
+              <div class="cart-item-action-col">
+                <button class="cart-card-delete-btn" @click="removeCartItem(item.id)">刪除</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="cart-right-summary">
-        <div class="summary-box">
-          <h4 class="summary-title">結帳明細</h4>
-          <div class="summary-item">
-            <span>商品總金額</span>
-            <strong>NT${{ store.cartSubtotal }}</strong>
+      <div class="cart-summary-sidebar-col">
+        <div class="checkout-detail-card">
+          <h3 class="checkout-card-title">結帳明細</h3>
+          
+          <div class="summary-line">
+            <span class="label">商品總金額</span>
+            <span class="value">NT${{ subtotal }}</span>
           </div>
-          <div class="summary-item">
-            <span>運費</span>
-            <strong>NT${{ store.cartItems.some(i => i.checked) ? store.shippingFee : 0 }}</strong>
+          
+          <div class="summary-line">
+            <span class="label">運費</span>
+            <span class="value shipping-fee-text">NT${{ subtotal > 0 ? shippingFee : 0 }}</span>
           </div>
-          <div class="summary-item total-row">
-            <span>結帳金額</span>
-            <strong class="pink-text">NT${{ store.cartTotalPrice }}</strong>
+          
+          <hr class="summary-hr">
+          
+          <div class="summary-line final-total-row">
+            <span class="label">結帳金額</span>
+            <span class="value total-price-red">NT${{ finalTotal }}</span>
           </div>
-          <button class="checkout-btn" @click="handleCheckout">結帳</button>
+          
+          <button class="pink-btn-rect checkout-submit-btn">
+            結帳
+          </button>
         </div>
       </div>
     </div>

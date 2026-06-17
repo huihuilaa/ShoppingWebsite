@@ -153,7 +153,7 @@ onMounted(() => {
       
       <div class="sort-select-wrapper" v-if="!props.searchQuery">
         <select v-model="sortBy" class="sort-dropdown">
-          <option value="date_desc">最新上架 v</option>
+          <option value="date_desc">最新上架</option>
           <option value="price_asc">價格：低到高</option>
           <option value="price_desc">價格：高到低</option>
         </select>
