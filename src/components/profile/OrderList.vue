@@ -82,3 +82,66 @@ const toggleOrderDetail = (orderId: string) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.profile-loading-text, .profile-empty-orders {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 60px 0;
+}
+.orders-accordion-list { display: flex; flex-direction: column; gap: 16px; }
+.order-accordion-group { border-radius: 4px; overflow: hidden; }
+.order-list-row-item {
+  background-color: #f8fafc;
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.order-col-id { font-size: 1.2rem; font-weight: bold; color: #334155; flex: 1.5; }
+.order-col-status { font-size: 1.15rem; font-weight: bold; color: #3b82f6; flex: 1; text-align: center; }
+.order-col-total { font-size: 1.15rem; font-weight: bold; color: #334155; flex: 1.5; text-align: center; }
+.pink-total-text { color: #ff66a3; font-size: 1.25rem; }
+.order-col-action { flex: 1; display: flex; justify-content: flex-end; }
+.btn-order-detail-outline {
+  background-color: #ffffff;
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-order-detail-outline:hover { background-color: rgba(59, 130, 246, 0.05); }
+
+/* 展開詳細面板 */
+.order-expanded-detail-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: #f1f5f9;
+}
+.order-expanded-detail-panel.is-open { max-height: 300px; }
+.expanded-inner-box {
+  padding: 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.inner-product-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.05rem;
+  color: #475569;
+  padding: 8px 0;
+}
+.p-title-spec { flex: 2; font-weight: bold; color: #334155; }
+.p-spec-hint { font-size: 0.95rem; color: #64748b; }
+.p-qty { flex: 1; text-align: center; }
+.p-single-price { flex: 1; text-align: center; font-weight: 500; }
+.p-subtotal { flex: 1; text-align: right; font-weight: bold; color: #ff66a3; }
+</style>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { db } from '../lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 import { useShopStore } from '../store/shop';
 
 const router = useRouter();
@@ -10,21 +8,19 @@ const store = useShopStore();
 const cartItems = computed(() => store.cartItems);
 const shippingFee = 50;
 
-const updateQuantity = async (item: any, newQty: number) => {
-  try {
-    await updateDoc(doc(db, 'carts', item.id), { quantity: Number(newQty) });
-    item.quantity = Number(newQty);
-  } catch (error) {
-    console.error(error);
-  }
+// ✅ 修正：改用 store 的方法來更新數量，不再於元件內直接呼叫 firestore
+const updateQuantity = async (id: string, newQty: number) => {
+  await store.updateCartQuantity(id, newQty);
 };
 
+// ✅ 修正：交給 store 管理狀態變化
 const toggleCheck = async (item: any) => {
   try {
-    await updateDoc(doc(db, 'carts', item.id), { checked: !item.checked });
+    const { updateCartItemService } = await import('../api/cart');
+    await updateCartItemService(item.id, { checked: !item.checked });
     item.checked = !item.checked;
   } catch (error) {
-    console.error(error);
+    console.error('切換選取狀態失敗:', error);
   }
 };
 
@@ -33,10 +29,11 @@ const removeCartItem = async (id: string) => {
   await store.removeFromCart(id);
 };
 
+// ✅ 修正：依據 types.ts 定義，改從 item.product.price 取得價格
 const subtotal = computed(() =>
   cartItems.value
     .filter(item => item.checked)
-    .reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
+    .reduce((sum, item) => sum + Number(item.product.price) * Number(item.quantity), 0)
 );
 
 const finalTotal = computed(() =>
@@ -76,12 +73,19 @@ onMounted(() => {
             </div>
             
             <div class="cart-main-info-card">
-              <div class="cart-item-name-col">{{ item.title }}</div>
-              <div class="cart-item-price-col">NT${{ item.price }}</div>
+              <div class="cart-item-name-col">
+                {{ item.product.title }}
+                <small v-if="item.selectedSpec" style="display: block; color: #888;">
+                  規格：{{ item.selectedSpec }}
+                </small>
+              </div>
+              
+              <div class="cart-item-price-col">NT${{ item.product.price }}</div>
+              
               <div class="cart-item-qty-col">
                 <select 
                   :value="item.quantity" 
-                  @change="updateQuantity(item, Number(($event.target as HTMLSelectElement).value))"
+                  @change="updateQuantity(item.id, Number(($event.target as HTMLSelectElement).value))"
                   class="cart-card-select"
                 >
                   <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
@@ -124,3 +128,135 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.cart-page-container {
+  max-width: 1000px;
+  margin: 40px auto 0 auto;
+  padding: 0 20px;
+}
+.cart-header-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1a252f;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+}
+.cart-header-title .blue-sq {
+  color: #3498db;
+  margin-right: 8px;
+}
+
+.cart-two-columns-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  width: 100%;
+}
+.cart-main-items-col {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.cart-summary-sidebar-col {
+  flex: 1;
+  position: sticky;
+  top: 100px;
+}
+
+.cart-empty-text-line {
+  display: block;
+  width: 100%;
+  font-size: 1.1rem;
+  color: #a0aec0;
+  padding: 30px 0;
+  text-align: left;
+}
+.cart-items-list-inner { display: flex; flex-direction: column; gap: 16px; }
+.cart-row-card-item { display: flex; align-items: center; width: 100%; }
+.cart-checkbox-outside {
+  padding-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cart-custom-checkbox {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  border: 1px solid #3498db;
+  border-radius: 4px;
+}
+.cart-main-info-card {
+  flex: 1;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  padding: 15px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cart-item-name-col, .cart-item-price-col {
+  font-size: 1.05rem;
+  color: #2c3e50;
+}
+.cart-item-name-col { flex: 2; text-align: left; font-weight: bold; }
+.cart-item-price-col { font-weight: bold; flex: 1; text-align: center; }
+.cart-item-qty-col { flex: 1; display: flex; justify-content: center; }
+.cart-card-select {
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  padding: 6px 20px;
+  font-size: 1rem;
+  color: #2c3e50;
+  border-radius: 4px;
+  text-align: center;
+  cursor: pointer;
+}
+.cart-item-action-col { flex: 1; display: flex; justify-content: flex-end; }
+.cart-card-delete-btn {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #718096;
+  font-size: 1.05rem;
+  font-weight: bold;
+  padding: 10px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cart-card-delete-btn:hover { background-color: #edf2f7; color: #2c3e50; }
+
+.checkout-detail-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 30px;
+}
+.checkout-card-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-align: center;
+}
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.summary-line .label, .summary-line .value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+.shipping-fee-text { color: #7f8c8d !important; }
+.final-total-row { margin-bottom: 30px; }
+.total-price-red { color: #ff66a3 !important; font-size: 1.4rem !important; }
+.summary-hr { border: none; border-top: 1px solid #e2e8f0; margin: 10px 0 20px; }
+.checkout-submit-btn { width: 100%; padding: 12px 0; font-size: 1.2rem; border-radius: 4px; }
+</style>

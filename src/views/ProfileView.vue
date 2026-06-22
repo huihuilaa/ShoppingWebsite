@@ -120,3 +120,57 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.profile-tab-container {
+  width: 100%;
+  max-width: 960px;
+  padding: 0 24px;
+}
+.profile-header-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 35px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 1px;
+}
+.profile-header-title .blue-sq {
+  color: #3b82f6;
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+.profile-tabs-nav {
+  display: flex;
+  position: relative;
+  top: 1px;
+  z-index: 2;
+}
+.tab-nav-btn {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 12px 36px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.tab-nav-btn.active {
+  color: #1e293b;
+  border-color: #cbd5e1;
+  border-bottom: 3px solid #3b82f6;
+  padding-bottom: 11px;
+  background-color: #ffffff;
+}
+.profile-tab-content-card {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 30px;
+  min-height: 450px;
+  border-radius: 0 4px 4px 4px;
+}
+</style>

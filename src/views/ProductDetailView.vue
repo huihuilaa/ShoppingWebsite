@@ -1,146 +1,277 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useShopStore } from '../store/shop';
-import { getProductByIdService } from '../api/products';
-import type { Product } from '../types'; 
+import { db } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
-const props = defineProps<{ 
-  productId: string 
-}>();
-
-const router = useRouter();
+const route = useRoute();
 const store = useShopStore();
 
-const product = ref<Product | null>(null); 
-const selectedSpec = ref('');
-const selectedQuantity = ref(1);
+const product = ref(null);
+const loading = ref(true);
+const error = ref(false);
+const quantity = ref(1);
 
-const loadProductDetail = async () => {
-  if (!props.productId) return;
+onMounted(async () => {
   try {
-    const data = await getProductByIdService(props.productId) as Product;
-    product.value = data;
-    if (product.value?.specs && product.value.specs.length > 0) {
-      selectedSpec.value = product.value.specs[0] || '';
+    const docRef = doc(db, 'products', route.params.id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      product.value = { id: docSnap.id, ...docSnap.data() };
+    } else {
+      error.value = true;
     }
-  } catch (error) {
-    console.error('載入商品詳情失敗:', error);
+  } catch (err) {
+    console.error(err);
+    error.value = true;
+  } finally {
+    loading.value = false;
   }
-};
-
-const updateQuantity = (change: number) => {
-  const newQty = selectedQuantity.value + change;
-  if (newQty >= 1 && newQty <= 10) {
-    selectedQuantity.value = newQty;
-  }
-};
-
-const addToCart = async () => {
-  if (!store.isLoggedIn) {
-    router.push({ name: 'login', query: { redirect: `/product/${props.productId}` } });
-    return;
-  }
-  if (product.value) {
-    await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
-    alert('已成功加入購物車！');
-  }
-};
-
-const buyNow = async () => {
-  if (!store.isLoggedIn) {
-    router.push({ name: 'login', query: { redirect: `/product/${props.productId}` } });
-    return;
-  }
-  if (product.value) {
-    await store.addToCart(product.value, selectedSpec.value, selectedQuantity.value);
-    router.push('/cart');
-  }
-};
-
-onMounted(() => {
-  loadProductDetail();
 });
 </script>
 
 <template>
-  <div class="container" v-if="product">
+  <div v-if="loading" class="loading-state">
+    <p>商品詳細資訊載入中...</p>
+  </div>
+  
+  <div v-else-if="error" class="error-state">
+    <h3>抱歉，該商品不存在或已下架。</h3>
+    <RouterLink to="/" class="back-home-btn">返回首頁</RouterLink>
+  </div>
+
+  <div v-else-if="product" class="detail-container">
     <div class="detail-layout">
-      <div class="detail-img-wrap">
-        <img :src="product.imageUrl" :alt="product.title">
+      <div class="detail-left">
+        <img :src="product.image" :alt="product.title">
       </div>
-      
-      <div class="detail-info">
-        <h1 class="detail-title">
-          {{ product.title }} <span class="detail-alias" v-if="product.alias">{{ product.alias }}</span>
-        </h1>
+      <div class="detail-right">
+        <h2>{{ product.title }}</h2>
+        <p class="price">NT$ {{ product.price }}</p>
+        <p class="desc">{{ product.description }}</p>
         
-        <div class="info-row-group">
-          <div class="info-row">
-            <span class="info-label">價錢：</span>
-            <span class="detail-price">NT${{ product.price }}</span>
-          </div>
-          
-          <div class="info-row align-start" v-if="product.specs && product.specs.length > 0">
-            <span class="info-label btn-label-pad">規格：</span>
-            <div class="detail-spec-buttons-wrap">
-              <button
-                v-for="spec in product.specs"
-                :key="spec"
-                class="spec-select-btn"
-                :class="{ active: selectedSpec === spec }"
-                @click="selectedSpec = spec"
-              >
-                {{ spec }}
-              </button>
-            </div>
-          </div>
+        <div class="quantity-selector">
+          <button @click="quantity > 1 ? quantity-- : null">-</button>
+          <span>{{ quantity }}</span>
+          <button @click="quantity++">+</button>
+        </div>
 
-          <div class="info-row">
-            <span class="info-label">數量：</span>
-            <div class="quantity-counter-box">
-              <button class="qty-btn" @click="updateQuantity(-1)" :disabled="selectedQuantity <= 1">-</button>
-              <span class="qty-number-display">{{ selectedQuantity }}</span>
-              <button class="qty-btn" @click="updateQuantity(1)" :disabled="selectedQuantity >= 10">+</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="action-group detail-action-margin">
-          <button class="pink-btn-rect text-bold btn-detail-add-cart" @click="addToCart">加入購物車</button>
-          <button class="btn-buy-now" @click="buyNow">立即購買</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="product-info-section">
-      <div class="section-title">
-        <span class="blue-sq">■</span>商品資訊 <span class="en">PRODUCT INFO</span>
-      </div>
-      
-      <div class="info-content-box custom-info-box">
-        <div class="content-row" v-if="product.bookingPeriod">
-          <span class="content-label">預購期間：</span>
-          <p class="content-text custom-text-style">{{ product.bookingPeriod }}</p>
-        </div>
-        <div class="content-row" v-if="product.releaseDate">
-          <span class="content-label">發售日期：</span>
-          <p class="content-text custom-text-style">{{ product.releaseDate }}</p>
-        </div>
-        <div class="content-row" v-if="product.shippingDate">
-          <span class="content-label">商品配送：</span>
-          <p class="content-text custom-text-style pre-line-style">{{ product.shippingDate }}</p>
-        </div>
-        <div class="content-row" v-if="product.contentDesc">
-          <span class="content-label">商品內容：</span>
-          <p class="content-text custom-text-style">{{ product.contentDesc }}</p>
-        </div>
-        <div class="content-row" v-if="product.sizeMaterial">
-          <span class="content-label">商品規格：</span>
-          <p class="content-text custom-text-style pre-line-style">{{ product.sizeMaterial }}</p>
-        </div>
+        <button class="add-cart-btn" @click="store.addToCart(product, quantity)">
+          加入購物車
+        </button>
       </div>
     </div>
   </div>
-  <div v-else class="empty-products-text text-center">商品載入中...</div>
 </template>
+
+<style scoped>
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 60px;
+  padding: 60px 0;
+  width: 100%;
+}
+.detail-img-wrap {
+  width: 100%;
+  max-width: 450px;
+  aspect-ratio: 1 / 1;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+}
+.detail-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+.detail-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin: 0 0 30px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-alias { font-size: 1.5rem; color: #8293a5; font-weight: 500; }
+.detail-price { font-size: 1.35rem; color: #ff66a3; font-weight: bold; }
+
+.info-row-group { display: flex; flex-direction: column; }
+.detail-info .info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.detail-info .info-row.align-start { align-items: flex-start; }
+
+.info-label {
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+.btn-label-pad { padding-top: 6px; }
+
+/* 規格按鈕 */
+.detail-spec-buttons-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+}
+.detail-info .info-row .detail-spec-buttons-wrap button.spec-select-btn {
+  background-color: #f0f6fc;
+  border: 1px solid #5ea6e4;
+  color: #5ea6e4;
+  font-size: 0.95rem;
+  font-weight: bold;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+  margin: 0;
+  width: auto;
+  height: auto;
+}
+.detail-info .info-row .detail-spec-buttons-wrap button.spec-select-btn:hover {
+  background-color: #e1eefc;
+}
+.detail-info .info-row .detail-spec-buttons-wrap button.spec-select-btn.active {
+  background-color: #ff66a3;
+  border: 1px solid #ff66a3;
+  color: #ffffff;
+}
+
+/* 數量選擇器 */
+.detail-info .info-row .quantity-counter-box {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #5ea6e4;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #ffffff;
+  height: 32px;
+  box-sizing: border-box;
+}
+.detail-info .info-row .quantity-counter-box button {
+  background-color: #ffffff;
+  border: none;
+  color: #5ea6e4;
+  font-size: 1.1rem;
+  font-weight: bold;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s;
+  outline: none;
+  box-sizing: border-box;
+}
+.detail-info .info-row .quantity-counter-box button:hover:not(:disabled) {
+  background-color: #f0f6fc;
+}
+.detail-info .info-row .quantity-counter-box button:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+.detail-info .info-row .quantity-counter-box .qty-number-display {
+  width: 36px;
+  min-width: 36px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  border-left: 1px solid #5ea6e4;
+  border-right: 1px solid #5ea6e4;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* 加入購物車 / 立即購買 按鈕 */
+.detail-info .detail-action-margin { margin-top: 35px; }
+.action-group { display: flex; gap: 15px; width: 100%; }
+.detail-info button.pink-btn-rect.btn-detail-add-cart {
+  background-color: #ffffff;
+  border: 1px solid #5ea6e4;
+  color: #5ea6e4;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: background-color 0.2s;
+  outline: none;
+}
+.detail-info button.pink-btn-rect.btn-detail-add-cart:hover {
+  background-color: #f0f6fc;
+}
+.btn-buy-now {
+  background-color: #ff66a3;
+  border: 1px solid #ff66a3;
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 0;
+  padding: 10px 35px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 商品資訊區塊 */
+.product-info-section {
+  padding-top: 40px;
+  padding-bottom: 100px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.product-info-section .section-title {
+  font-size: 1.35rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 40px;
+}
+.custom-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: 20px 0;
+}
+.custom-info-box .content-row { display: flex; align-items: flex-start; }
+.custom-info-box .content-label {
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 1.15rem;
+  white-space: nowrap;
+  min-width: 100px;
+}
+.custom-text-style {
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 1.15rem;
+  margin: 0;
+  line-height: 1.6;
+}
+.pre-line-style { white-space: pre-line; }
+</style>

@@ -1,80 +1,83 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import type { RouteLocationNormalized } from 'vue-router';
 import { auth } from '../lib/firebase';
-import HomeView from '../views/HomeView.vue';
-import ProductDetailView from '../views/ProductDetailView.vue';
-import CartView from '../views/CartView.vue';
-import ProfileView from '../views/ProfileView.vue';
-import AuthView from '../views/AuthView.vue';
-import AdminView from '../views/AdminView.vue';
+
+const waitForAuth = (): Promise<any> => {
+  return new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
+};
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView,
+  { 
+    path: '/', 
+    name: 'home', 
+    component: () => import('../views/HomeView.vue') 
   },
-  {
-    path: '/product/:id',
+  { 
+    path: '/product/:id', 
     name: 'detail',
-    component: ProductDetailView,
-    props: (route: any) => ({ productId: route.params.id }),
+    component: () => import('../views/ProductDetailView.vue'),
+    props: (route: RouteLocationNormalized) => ({ productId: route.params.id }) 
   },
-  {
-    path: '/cart',
+  { 
+    path: '/cart', 
     name: 'cart',
-    component: CartView,
-    meta: { requiresAuth: true },
+    component: () => import('../views/CartView.vue'),
+    meta: { requiresAuth: true } 
   },
-  {
-    path: '/profile',
+  { 
+    path: '/profile', 
     name: 'profile',
-    component: ProfileView,
-    meta: { requiresAuth: true },
+    component: () => import('../views/ProfileView.vue'),
+    meta: { requiresAuth: true } 
   },
-  {
-    path: '/login',
+  { 
+    path: '/login', 
     name: 'login',
-    component: AuthView,
-    props: { mode: 'login' },
+    component: () => import('../views/AuthView.vue') 
   },
-  {
-    path: '/register',
+  { 
+    path: '/register', 
     name: 'register',
-    component: AuthView,
-    props: { mode: 'register' },
+    component: () => import('../views/AuthView.vue') 
   },
-  {
-    path: '/admin',
+  { 
+    path: '/admin', 
     name: 'admin',
-    component: AdminView,
-    meta: { requiresAuth: true, requiresAdmin: true },
+    component: () => import('../views/AdminView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true } 
   },
+  { 
+    path: '/:pathMatch(.*)*', 
+    redirect: '/' 
+  }
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior: () => ({ top: 0 }),
 });
 
-router.beforeEach((to, _from, next) => {
-  const requiresAuth = to.meta.requiresAuth;
-  const requiresAdmin = to.meta.requiresAdmin;
-  const currentUser = auth.currentUser;
+router.beforeEach(async (to) => {
+  const currentUser = await waitForAuth();
 
-  if (requiresAuth && !currentUser) {
-    next({ name: 'login', query: { redirect: to.fullPath } });
-    return;
+  if (to.meta.requiresAuth && !currentUser) {
+    return { name: 'login', query: { redirect: to.fullPath } };
   }
 
-  if (requiresAdmin) {
+  if (to.meta.requiresAdmin) {
     const isAdmin = sessionStorage.getItem('adminVerified') === 'true';
-    if (!isAdmin) {
-      next({ name: 'home' });
-      return;
-    }
+    if (!isAdmin) return { name: 'home' };
   }
 
-  next();
+  if ((to.name === 'login' || to.name === 'register') && currentUser) {
+    return { name: 'profile' };
+  }
 });
 
 export default router;
