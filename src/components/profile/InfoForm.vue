@@ -65,7 +65,6 @@ watch(() => props.initialPhone, (v) => { if (v !== undefined) profileForm.value.
 </template>
 
 <style scoped>
-.tab-pane-view { }
 .info-form-layout { padding: 20px 10px; }
 .form-fields-column {
   display: flex;

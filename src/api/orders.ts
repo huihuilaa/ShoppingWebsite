@@ -1,5 +1,5 @@
 import { db, auth } from '../lib/firebase';
-import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, where, doc, setDoc } from 'firebase/firestore';
 
 export const getUserOrdersService = async () => {
   const currentUser = auth.currentUser;
@@ -18,4 +18,15 @@ export const getUserOrdersService = async () => {
     id: doc.id,
     ...doc.data()
   }));
+};
+
+export const createOrderService = async (orderData: any, customId: string) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    throw new Error('UNAUTHENTICATED');
+  }
+  
+  await setDoc(doc(db, 'orders', customId), orderData);
+  
+  return customId;
 };

@@ -8,19 +8,17 @@ const store = useShopStore();
 const cartItems = computed(() => store.cartItems);
 const shippingFee = 50;
 
-// ✅ 修正：改用 store 的方法來更新數量，不再於元件內直接呼叫 firestore
 const updateQuantity = async (id: string, newQty: number) => {
   await store.updateCartQuantity(id, newQty);
 };
 
-// ✅ 修正：交給 store 管理狀態變化
 const toggleCheck = async (item: any) => {
   try {
     const { updateCartItemService } = await import('../api/cart');
     await updateCartItemService(item.id, { checked: !item.checked });
     item.checked = !item.checked;
   } catch (error) {
-    console.error('切換選取狀態失敗:', error);
+    console.error(error);
   }
 };
 
@@ -29,16 +27,42 @@ const removeCartItem = async (id: string) => {
   await store.removeFromCart(id);
 };
 
-// ✅ 修正：依據 types.ts 定義，改從 item.product.price 取得價格
 const subtotal = computed(() =>
   cartItems.value
     .filter(item => item.checked)
-    .reduce((sum, item) => sum + Number(item.product.price) * Number(item.quantity), 0)
+    .reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
 );
 
 const finalTotal = computed(() =>
   subtotal.value > 0 ? subtotal.value + shippingFee : 0
 );
+
+const handleCheckout = async () => {
+  const checkedItems = cartItems.value.filter(item => item.checked);
+  if (checkedItems.length === 0) {
+    alert('您的購物車中沒有選取任何商品！');
+    return;
+  }
+
+  const profile = await store.fetchUserProfile();
+
+  if (!profile) {
+    alert('您的個人寄送資訊（姓名、電話或地址）尚未填寫完整，將自動為您跳轉至會員中心補齊！');
+    router.push({ 
+      name: 'profile', 
+      query: { redirect: '/cart', tab: 'info' }
+    });
+    return;
+  }
+
+  const confirmText = `確認使用以下資訊進行結帳嗎？\n\n收件人：${profile.name}\n電話：${profile.phone}\n地址：${profile.address}`;
+  if (!confirm(confirmText)) return;
+
+  const newOrderId = await store.checkout(profile);
+  if (newOrderId) {
+    router.push({ name: 'order-success', query: { id: newOrderId } });
+  }
+};
 
 onMounted(() => {
   store.loadCart();
@@ -74,14 +98,12 @@ onMounted(() => {
             
             <div class="cart-main-info-card">
               <div class="cart-item-name-col">
-                {{ item.product.title }}
-                <small v-if="item.selectedSpec" style="display: block; color: #888;">
+                {{ item.title }}
+                <small v-if="item.selectedSpec" style="display: block; color: #888; margin-top: 2px;">
                   規格：{{ item.selectedSpec }}
                 </small>
               </div>
-              
-              <div class="cart-item-price-col">NT${{ item.product.price }}</div>
-              
+              <div class="cart-item-price-col">NT${{ item.price }}</div>
               <div class="cart-item-qty-col">
                 <select 
                   :value="item.quantity" 
@@ -120,7 +142,7 @@ onMounted(() => {
             <span class="value total-price-red">NT${{ finalTotal }}</span>
           </div>
           
-          <button class="pink-btn-rect checkout-submit-btn">
+          <button class="pink-btn-rect checkout-submit-btn" @click="handleCheckout">
             結帳
           </button>
         </div>

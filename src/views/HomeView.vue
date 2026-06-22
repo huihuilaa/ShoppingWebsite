@@ -2,6 +2,8 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getAllProductsService } from '../api/products';
+import ProductCard from '../components/shop/ProductCard.vue';
+import FeaturedProducts from '../components/shop/FeaturedProducts.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -24,7 +26,6 @@ const loadAllProducts = async () => {
   }
 };
 
-// 搜尋：從 URL query 取得
 const searchQuery = computed(() => (route.query.q as string) || '');
 
 const filteredProducts = computed(() => {
@@ -74,97 +75,66 @@ onMounted(() => {
       <RouterLink to="/" class="clear-search-link">✕ 清除搜尋</RouterLink>
     </div>
 
-    <div class="featured-top-section" v-if="!searchQuery">
-      <div class="custom-title-style">
-        <span class="blue-sq">■</span>推薦商品<span class="en">FEATURED PRODUCTS</span>
-      </div>
-      <hr class="section-divider">
-      
-      <div v-if="loading" class="empty-products-text text-center">
-        商品載入中...
-      </div>
-      
-      <div v-else class="featured-grid">
-        <div 
-          v-for="product in featuredProducts" 
-          :key="product.id" 
-          class="featured-card"
-          @click="router.push(`/product/${product.id}`)"
-        >
-          <div class="product-img-wrapper">
-            <img :src="product.imageUrl" :alt="product.title" class="product-card-img">
-          </div>
-          <div class="featured-card-info">
-            <h4 class="product-card-title">{{ product.title }}</h4>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="filter-search-row">
-      <div class="custom-title-style">
-        <span class="blue-sq">■</span>所有商品<span class="en">ALL PRODUCTS</span>
-      </div>
-      
-      <div class="sort-dropdown-wrapper">
-        <select v-model="sortOrder" class="sort-dropdown">
-          <option value="default">預設排序</option>
-          <option value="price-asc">價格：由低到高</option>
-          <option value="price-desc">價格：由高到低</option>
-        </select>
-      </div>
-    </div>
-    <hr class="section-divider divider-bottom-spacing">
-
     <div v-if="loading" class="empty-products-text text-center">
-      商品列表載入中...
-    </div>
-
-    <div v-else-if="sortedProducts.length === 0" class="empty-products-container">
-      <p class="empty-products-text">找不到符合的商品。</p>
+      商品載入中...
     </div>
 
     <template v-else>
-      <div class="custom-four-columns">
-        <div 
-          v-for="product in paginatedProducts" 
-          :key="product.id" 
-          class="product-card"
-          @click="router.push(`/product/${product.id}`)"
-        >
-          <div class="product-img-wrapper">
-            <img :src="product.imageUrl" :alt="product.title" class="product-card-img">
-          </div>
-          <div class="product-card-info">
-            <h4 class="product-card-title">{{ product.title }}</h4>
-            <div class="product-card-footer">
-              <div class="product-card-price">NT${{ product.price }}</div>
-            </div>
-          </div>
+      <FeaturedProducts 
+        v-if="!searchQuery" 
+        :products="featuredProducts" 
+      />
+
+      <div class="filter-search-row">
+        <div class="custom-title-style">
+          <span class="blue-sq">■</span>所有商品<span class="en">ALL PRODUCTS</span>
+        </div>
+        
+        <div class="sort-dropdown-wrapper">
+          <select v-model="sortOrder" class="sort-dropdown">
+            <option value="default">預設排序</option>
+            <option value="price-asc">價格：由低到高</option>
+            <option value="price-desc">價格：由高到低</option>
+          </select>
         </div>
       </div>
+      <hr class="section-divider divider-bottom-spacing">
 
-      <div class="pagination-wrap" v-if="totalPages > 1">
-        <button
-          class="page-btn"
-          :disabled="currentPage === 1"
-          @click="currentPage--"
-        >‹</button>
-
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          class="page-btn"
-          :class="{ active: currentPage === page }"
-          @click="currentPage = page"
-        >{{ page }}</button>
-
-        <button
-          class="page-btn"
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
-        >›</button>
+      <div v-if="sortedProducts.length === 0" class="empty-products-container">
+        <p class="empty-products-text">找不到符合的商品。</p>
       </div>
+
+      <template v-else>
+        <div class="custom-four-columns">
+          <ProductCard 
+            v-for="product in paginatedProducts" 
+            :key="product.id" 
+            :product="product" 
+          />
+        </div>
+
+        <div class="pagination-wrap" v-if="totalPages > 1">
+          <button
+            class="page-btn"
+            :disabled="currentPage === 1"
+            @click="currentPage--"
+          >‹</button>
+
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            class="page-btn"
+            :class="{ active: currentPage === page }"
+            @click="currentPage = page"
+          >{{ page }}</button>
+
+          <button
+            class="page-btn"
+            :disabled="currentPage === totalPages"
+            @click="currentPage++"
+          >›</button>
+        </div>
+      </template>
     </template>
   </div>
 </template>
@@ -176,42 +146,12 @@ onMounted(() => {
   padding: 0 20px;
   margin-top: 40px;
 }
-
-.featured-top-section {
-  width: 100%;
-  margin-bottom: 20px;
-}
-.featured-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  margin-bottom: 40px;
-}
-.featured-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.featured-card:hover { transform: translateY(-4px); }
-.featured-card-info {
-  width: 100%;
-  text-align: center;
-  margin-top: 15px;
-}
-.featured-card-info .product-card-title {
-  text-align: center;
-  justify-content: center;
-  height: auto;
-  min-height: unset;
-  margin: 0;
-  color: #1a252f;
+.empty-products-text {
+  color: #94a3b8;
   font-size: 1.1rem;
+  text-align: center;
+  padding: 60px 0;
 }
-
-/* 搜尋結果提示 */
 .clear-search-link {
   margin-left: 12px;
   color: #94a3b8;
@@ -250,56 +190,6 @@ onMounted(() => {
   padding: 20px 0 60px 0;
   width: 100%;
 }
-.product-img-wrapper {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #ffffff;
-}
-.product-card-img { width: 100%; height: 100%; object-fit: cover; }
-.product-card-info {
-  width: 100%;
-  text-align: left;
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0 5px;
-  box-sizing: border-box;
-}
-.product-card-title {
-  font-size: 1.05rem;
-  color: #2c3e50;
-  font-weight: bold;
-  line-height: 1.4;
-  margin: 0 0 6px 0;
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 2.8em;
-}
-.product-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  margin-top: auto;
-}
-.product-card-price {
-  font-size: 1.2rem;
-  color: #ff66a3;
-  font-weight: bold;
-}
-.product-card {
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.product-card:hover { transform: translateY(-4px); }
-.product-card:active { transform: translateY(-1px); }
 
 .pagination-wrap {
   display: flex;

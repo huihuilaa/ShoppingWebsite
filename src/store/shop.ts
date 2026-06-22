@@ -1,19 +1,20 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { auth } from '../lib/firebase';
-import { getAllProductsService } from '../api/products'; // ✅ 修正為正確的 Service 名稱
-import { getUserOrdersService } from '../api/orders';     // ✅ 修正為正確的 Service 名稱
+import { ref } from 'vue';
+import { auth, db } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { getAllProductsService } from '../api/products';
+import { getUserOrdersService, createOrderService } from '../api/orders';
 import { getCartItemsService, addCartItemService, removeCartItemService, updateCartItemService } from '../api/cart';
-import type { Product, CartItem, Order } from '../types';
+import type { Product } from '../types';
 
 export const useShopStore = defineStore('shop', () => {
   const isLoggedIn = ref(false);
   const products = ref<Product[]>([]);
-  const cartItems = ref<CartItem[]>([]);
-  const orders = ref<Order[]>([]);
+  const cartItems = ref<any[]>([]);
+  const orders = ref<any[]>([]);
   const cartLoaded = ref(false);
+  const userProfile = ref<{ name: string; phone: string; address: string } | null>(null);
 
-  // 取得商品列表
   const fetchProducts = async () => {
     try {
       products.value = await getAllProductsService() as Product[];
@@ -22,20 +23,17 @@ export const useShopStore = defineStore('shop', () => {
     }
   };
 
-  // 載入購物車
   const loadCart = async (force = false) => {
     if (cartLoaded.value && !force) return;
     try {
       const data = await getCartItemsService();
-      // ✅ 確保符合 CartItem[] 型別轉換
-      cartItems.value = data as unknown as CartItem[];
+      cartItems.value = data;
       cartLoaded.value = true;
     } catch (error) {
       console.error('載入購物車失敗:', error);
     }
   };
 
-  // 加入購物車
   const addToCart = async (product: Product, spec: string, quantity: number) => {
     const user = auth.currentUser;
     if (!user) {
@@ -43,34 +41,26 @@ export const useShopStore = defineStore('shop', () => {
       return;
     }
 
-    // ✅ 修正：依據 types.ts，從 item.product.id 比對
-    const existingItem = cartItems.value.find(item => item.product.id === product.id && item.selectedSpec === spec);
+    const existingItem = cartItems.value.find(item => item.productId === product.id && item.selectedSpec === spec);
 
     if (existingItem) {
       const newQty = existingItem.quantity + quantity;
       await updateCartItemService(existingItem.id, { quantity: newQty });
       existingItem.quantity = newQty;
     } else {
-      const newItemData = {
+      const cartItemData = {
         userId: user.uid,
         productId: product.id,
         title: product.title,
-        price: product.price,
-        imageUrl: product.imageUrl,
+        price: Number(product.price),
+        imageUrl: product.imageUrl || '',
         selectedSpec: spec || '標準款',
         quantity,
         checked: true,
         createdAt: new Date().getTime()
       };
-      const newId = await addCartItemService(newItemData);
-      
-      cartItems.value.unshift({
-        id: newId,
-        product: product,
-        selectedSpec: spec || '標準款',
-        quantity,
-        checked: true
-      });
+      const newId = await addCartItemService(cartItemData);
+      cartItems.value.push({ id: newId, ...cartItemData });
     }
     alert('已加入購物車！');
   };
@@ -98,29 +88,91 @@ export const useShopStore = defineStore('shop', () => {
     }
   };
 
+  const fetchUserProfile = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return null;
+    try {
+      const docRef = doc(db, 'users', currentUser.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.name && data.phone && data.address) {
+          userProfile.value = { name: data.name, phone: data.phone, address: data.address };
+          return userProfile.value;
+        }
+      }
+      userProfile.value = null;
+      return null;
+    } catch (error) {
+      console.error('調用個人資訊失敗:', error);
+      return null;
+    }
+  };
+
+  const checkout = async (customerInfo: { name: string; phone: string; address: string }) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return false;
+
+    const checkedItems = cartItems.value.filter(item => item.checked);
+    if (checkedItems.length === 0) return false;
+
+    try {
+      const subtotal = checkedItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+      const shippingFee = 50;
+      const totalPrice = subtotal + shippingFee;
+
+      const randomOrderId = Math.floor(100000 + Math.random() * 900000).toString();
+
+      const orderData = {
+        userId: currentUser.uid,
+        status: '已付款',
+        totalPrice: totalPrice,
+        customerInfo,
+        items: checkedItems.map(item => ({
+          title: item.title,
+          spec: item.selectedSpec || '標準款',
+          quantity: Number(item.quantity),
+          price: Number(item.price)
+        })),
+        createdAt: new Date().getTime()
+      };
+
+      const orderId = await createOrderService(orderData, randomOrderId);
+
+      for (const item of checkedItems) {
+        await removeCartItemService(item.id);
+      }
+
+      cartItems.value = cartItems.value.filter(item => !item.checked);
+      
+      return orderId;
+    } catch (error) {
+      console.error('建立訂單失敗:', error);
+      return false;
+    }
+  };
+
   const fetchUserOrders = async () => {
     try {
-      orders.value = await getUserOrdersService() as Order[];
+      orders.value = await getUserOrdersService();
     } catch (error) {
       console.error('載入訂單失敗:', error);
     }
   };
-
-  const cartTotal = computed(() => {
-    return cartItems.value.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  });
 
   return {
     isLoggedIn,
     products,
     cartItems,
     orders,
+    userProfile,
     fetchProducts,
     loadCart,
     addToCart,
     updateCartQuantity,
     removeFromCart,
+    fetchUserProfile,
     fetchUserOrders,
-    cartTotal
+    checkout
   };
 });

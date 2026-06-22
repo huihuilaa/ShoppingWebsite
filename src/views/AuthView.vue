@@ -7,7 +7,6 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 const route = useRoute();
 const router = useRouter();
 
-// ✅ 直接從動態路由名稱推導 mode
 const isLogin = computed(() => route.name === 'login');
 
 const email = ref('');
@@ -18,7 +17,6 @@ const handleSubmit = async () => {
   try {
     if (isLogin.value) {
       await signInWithEmailAndPassword(auth, email.value, password.value);
-      // 自動跳轉回原頁面或會員中心
       const redirectPath = route.query.redirect || '/profile';
       router.push(redirectPath.toString());
     } else {
@@ -34,21 +32,33 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="auth-container">
-    <h2>{{ isLogin ? '會員登入' : '新會員註冊' }}</h2>
-    <form @submit.prevent="handleSubmit" class="auth-form">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" v-model="email" required>
+  <div class="container main-content auth-page-container">
+    <div class="auth-card">
+      <h2 class="auth-title">{{ isLogin ? '會員登入' : '新會員註冊' }}</h2>
+      
+      <form @submit.prevent="handleSubmit" class="auth-form">
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" v-model="email" required>
+        </div>
+        
+        <div class="auth-field">
+          <label>密碼</label>
+          <input type="password" v-model="password" required>
+        </div>
+        
+        <div class="auth-action-row">
+          <button type="submit" class="pink-btn-rect">
+            {{ isLogin ? '登入' : '註冊' }}
+          </button>
+        </div>
+      </form>
+
+      <div class="auth-switch-links">
+        <RouterLink v-if="isLogin" to="/register">還不是會員？點此註冊</RouterLink>
+        <RouterLink v-else to="/login">已經是會員？點此登入</RouterLink>
       </div>
-      <div class="form-group">
-        <label>密碼</label>
-        <input type="password" v-model="password" required>
-      </div>
-      <button type="submit" class="btn-submit">
-        {{ isLogin ? '登入' : '註冊' }}
-      </button>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -126,7 +136,7 @@ const handleSubmit = async () => {
   width: 100%;
   max-width: 380px;
 }
-.auth-switch-links { margin-top: 15px; text-align: center; }
+.auth-switch-links { margin-top: 25px; text-align: center; }
 .auth-switch-links a {
   color: #767676;
   font-size: 0.95rem;

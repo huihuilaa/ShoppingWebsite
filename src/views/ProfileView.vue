@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { auth, db } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -9,6 +9,7 @@ import InfoForm from '../components/profile/InfoForm.vue';
 import OrderList from '../components/profile/OrderList.vue';
 
 const router = useRouter();
+const route = useRoute();
 const store = useShopStore();
 const activeTab = ref<'info' | 'orders'>('info');
 const userEmail = ref('');
@@ -51,7 +52,12 @@ const handleSave = async (formData: { name: string; email: string; address: stri
       phone: formData.phone,
       updatedAt: new Date().getTime(),
     }, { merge: true });
+    
     alert('資料已儲存！');
+
+    if (route.query.redirect) {
+      router.push(route.query.redirect.toString());
+    }
   } catch (error) {
     console.error('儲存失敗:', error);
     alert('儲存失敗，請稍後再試');
@@ -74,6 +80,10 @@ const switchTab = (tab: 'info' | 'orders') => {
 
 onMounted(() => {
   loadProfile();
+
+  if (route.query.tab === 'orders') {
+    switchTab('orders');
+  }
 });
 </script>
 
@@ -125,6 +135,7 @@ onMounted(() => {
 .profile-tab-container {
   width: 100%;
   max-width: 960px;
+  margin: 0 auto; /* ✅ 加上置中確保在大螢幕上排版美觀 */
   padding: 0 24px;
 }
 .profile-header-title {

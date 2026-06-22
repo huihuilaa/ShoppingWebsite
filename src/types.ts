@@ -16,10 +16,15 @@ export interface Product {
 
 export interface CartItem {
   id: string;
-  product: Product;
+  userId: string;
+  productId: string;
+  title: string;
+  price: number;
+  imageUrl: string;
   selectedSpec: string;
   quantity: number;
   checked: boolean;
+  createdAt: number;
 }
 
 export interface Order {

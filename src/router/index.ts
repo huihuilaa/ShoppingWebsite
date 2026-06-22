@@ -54,6 +54,12 @@ const routes = [
   { 
     path: '/:pathMatch(.*)*', 
     redirect: '/' 
+  },
+  {
+  path: '/order-success',
+  name: 'order-success',
+  component: () => import('../views/OrderSuccessView.vue'),
+  meta: { requiresAuth: true }
   }
 ];
 

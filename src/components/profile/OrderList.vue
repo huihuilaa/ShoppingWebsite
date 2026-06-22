@@ -35,24 +35,24 @@ const toggleOrderDetail = (orderId: string) => {
       >
         <div class="order-list-row-item">
           <div class="order-col-id">
-            訂單編號 #{{ order.orderId }}
+            訂單編號 #{{ order.id }}
           </div>
           <div class="order-col-status">
             {{ order.status || '已付款' }}
           </div>
           <div class="order-col-total">
-            總額：<span class="pink-total-text">NT${{ order.totalAmount }}</span>
+            總額：<span class="pink-total-text">NT${{ order.totalPrice }}</span>
           </div>
           <div class="order-col-action">
-            <button class="btn-order-detail-outline" @click="toggleOrderDetail(order.orderId)">
-              訂單明細
+            <button class="btn-order-detail-outline" @click="toggleOrderDetail(order.id)">
+              {{ expandedOrderId === order.id ? '收起明細' : '訂單明細' }}
             </button>
           </div>
         </div>
 
         <div 
           class="order-expanded-detail-panel"
-          :class="{ 'is-open': expandedOrderId === order.orderId }"
+          :class="{ 'is-open': expandedOrderId === order.id }"
         >
           <div class="expanded-inner-box">
             <div 
@@ -62,8 +62,8 @@ const toggleOrderDetail = (orderId: string) => {
             >
               <div class="p-title-spec">
                 {{ item.title }} 
-                <span class="p-spec-hint" v-if="item.selectedSpec && item.selectedSpec !== '標準款'">
-                  ({{ item.selectedSpec }})
+                <span class="p-spec-hint" v-if="item.spec && item.spec !== '標準款'">
+                  ({{ item.spec }})
                 </span>
               </div>
               <div class="p-qty">
@@ -75,6 +75,10 @@ const toggleOrderDetail = (orderId: string) => {
               <div class="p-subtotal">
                 NT${{ Number(item.price) * Number(item.quantity) }}
               </div>
+            </div>
+            
+            <div v-if="order.customerInfo" style="font-size: 0.9rem; color: #64748b; margin-top: 10px; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
+              收件人：{{ order.customerInfo.name }} | 寄送地址：{{ order.customerInfo.address }}
             </div>
           </div>
         </div>
@@ -117,14 +121,13 @@ const toggleOrderDetail = (orderId: string) => {
 }
 .btn-order-detail-outline:hover { background-color: rgba(59, 130, 246, 0.05); }
 
-/* 展開詳細面板 */
 .order-expanded-detail-panel {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease-out;
   background-color: #f1f5f9;
 }
-.order-expanded-detail-panel.is-open { max-height: 300px; }
+.order-expanded-detail-panel.is-open { max-height: 500px; }
 .expanded-inner-box {
   padding: 16px 40px;
   display: flex;

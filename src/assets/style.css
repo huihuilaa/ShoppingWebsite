@@ -1,11 +1,9 @@
-/* Reset & 全域 base */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #213547;
+  background-color: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -56,7 +54,6 @@ button:hover { border-color: #646cff; }
 button:focus,
 button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
 
-/* 跨元件共用 utility */
 .container {
   width: 100%;
   max-width: 1200px;
@@ -72,7 +69,6 @@ button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
   min-height: calc(100vh - 200px);
 }
 
-/* 跨頁共用的小元件 */
 .blue-sq {
   color: #5ea6e4;
   margin-right: 8px;
