@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getProducts, addProduct, deleteProduct } from '../api/products';
+import { getAllProductsService, addProductService, deleteProductService } from '../api/products';
 
 const products = ref([]);
 const title = ref('');
@@ -10,7 +10,7 @@ const image = ref('');
 
 const loadProducts = async () => {
   try {
-    products.value = await getProducts();
+    products.value = await getAllProductsService();
   } catch (error) {
     console.error('後台商品載入失敗:', error);
   }
@@ -19,7 +19,7 @@ const loadProducts = async () => {
 const handleAddProduct = async () => {
   if (!title.value || price.value <= 0) return;
   try {
-    await addProduct({
+    await addProductService({
       title: title.value,
       price: Number(price.value),
       description: description.value,
@@ -39,7 +39,7 @@ const handleAddProduct = async () => {
 const handleDeleteProduct = async (id) => {
   if (!confirm('確定要刪除此商品嗎？')) return;
   try {
-    await deleteProduct(id);
+    await deleteProductService(id);
     await loadProducts();
   } catch (error) {
     console.error(error);

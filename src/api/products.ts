@@ -31,3 +31,17 @@ export const getProductByIdService = async (productId: string) => {
     throw error;
   }
 };
+
+import { addDoc, deleteDoc } from 'firebase/firestore';
+
+export const addProductService = async (productData: any) => {
+  const docRef = await addDoc(collection(db, 'products'), {
+    ...productData,
+    createdAt: new Date().getTime()
+  });
+  return docRef.id;
+};
+
+export const deleteProductService = async (productId: string) => {
+  await deleteDoc(doc(db, 'products', productId));
+};
