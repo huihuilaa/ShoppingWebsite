@@ -1,0 +1,1 @@
+import{C as e,E as t,M as n,O as r,R as i,i as a,j as o,o as s}from"./index-BjCGFkg5.js";var c={class:`admin-container`},l={__name:`AdminView`,setup(l){let{show:u}=a(),d=i([]);return i(``),i(0),i(``),i(``),o(async()=>{try{d.value=await s()}catch(e){console.error(`後台商品載入失敗:`,e)}}),(i,a)=>(n(),t(`div`,c,[...a[0]||=[e(`h2`,null,`管理員後台面板`,-1),r(` ... `,-1)]]))}};export{l as default};
