@@ -4,6 +4,8 @@ import { useShopStore } from './store/shop';
 import { auth } from './lib/firebase';
 import NavBar from './components/ui/NavBar.vue';
 import AppFooter from './components/ui/Footer.vue';
+import ToastNotify from './components/ui/ToastNotify.vue';
+import { toastRef } from './composables/useToast';
 
 const store = useShopStore();
 
@@ -19,8 +21,11 @@ auth.onAuthStateChanged((user) => {
 </script>
 
 <template>
-  <NavBar /> <main class="main-content">
+  <NavBar />
+  <main class="main-content">
     <RouterView />
   </main>
+  <AppFooter />
 
-  <AppFooter /> </template>
+  <ToastNotify :ref="(el) => { toastRef.value = el }" />
+</template>

@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { getAllProductsService } from '../api/products';
 import { getUserOrdersService, createOrderService } from '../api/orders';
 import { getCartItemsService, addCartItemService, removeCartItemService, updateCartItemService } from '../api/cart';
+import { useToast } from '../composables/useToast';
 import type { Product } from '../types';
 
 export const useShopStore = defineStore('shop', () => {
@@ -14,6 +15,7 @@ export const useShopStore = defineStore('shop', () => {
   const orders = ref<any[]>([]);
   const cartLoaded = ref(false);
   const userProfile = ref<{ name: string; phone: string; address: string } | null>(null);
+  const { show: showToast } = useToast();
 
   const fetchProducts = async () => {
     try {
@@ -37,7 +39,7 @@ export const useShopStore = defineStore('shop', () => {
   const addToCart = async (product: Product, spec: string, quantity: number) => {
     const user = auth.currentUser;
     if (!user) {
-      alert('請先登入！');
+      showToast('請先登入！', 'error');
       return;
     }
 
@@ -62,7 +64,7 @@ export const useShopStore = defineStore('shop', () => {
       const newId = await addCartItemService(cartItemData);
       cartItems.value.push({ id: newId, ...cartItemData });
     }
-    alert('已加入購物車！');
+    showToast('已加入購物車！', 'success');
   };
 
   const updateCartQuantity = async (id: string, quantity: number) => {
@@ -144,7 +146,6 @@ export const useShopStore = defineStore('shop', () => {
       }
 
       cartItems.value = cartItems.value.filter(item => !item.checked);
-      
       return orderId;
     } catch (error) {
       console.error('建立訂單失敗:', error);

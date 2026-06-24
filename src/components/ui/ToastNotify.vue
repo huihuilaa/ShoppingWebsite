@@ -1,42 +1,77 @@
 <script setup lang="ts">
-defineProps<{
-  message: string;
-  visible: boolean;
-}>();
+import { ref } from 'vue';
 
-defineEmits(['close']);
+interface Toast {
+  id: number;
+  message: string;
+  type: 'success' | 'error';
+}
+
+const toasts = ref<Toast[]>([]);
+let counter = 0;
+
+const show = (message: string, type: 'success' | 'error' = 'success') => {
+  const id = counter++;
+  toasts.value.push({ id, message, type });
+  setTimeout(() => {
+    toasts.value = toasts.value.filter(t => t.id !== id);
+  }, 3000);
+};
+
+defineExpose({ show });
 </script>
 
 <template>
-  <Transition name="toast-fade">
-    <div v-if="visible" class="toast-wrapper">
-      <div class="toast-content">
-        <span class="toast-icon">✨</span>
-        <span class="toast-text">{{ message }}</span>
+  <div class="toast-container">
+    <transition-group name="toast">
+      <div
+        v-for="toast in toasts"
+        :key="toast.id"
+        class="toast"
+        :class="toast.type"
+      >
+        <span class="toast-icon">{{ toast.type === 'success' ? '✓' : '✕' }}</span>
+        {{ toast.message }}
       </div>
-    </div>
-  </Transition>
+    </transition-group>
+  </div>
 </template>
 
 <style scoped>
-.toast-wrapper {
+.toast-container {
   position: fixed;
-  top: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #1e293b;
-  color: #ffffff;
-  padding: 14px 32px;
-  border-radius: 4px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  top: 80px;
+  right: 24px;
   z-index: 9999;
-  pointer-events: none;
-  border-left: 4px solid #ff66a3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.toast-content { display: flex; align-items: center; gap: 12px; }
-.toast-icon { font-size: 1.1rem; }
-.toast-text { font-size: 0.95rem; font-weight: bold; letter-spacing: 0.5px; }
 
-.toast-fade-enter-active, .toast-fade-leave-active { transition: all 0.2s ease-out; }
-.toast-fade-enter-from, .toast-fade-leave-to { opacity: 0; transform: translate(-50%, -20px); }
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  max-width: 340px;
+}
+
+.toast.success { background-color: #4caf82; }
+.toast.error   { background-color: #e05c5c; }
+
+.toast-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.toast-enter-active { transition: all 0.3s ease; }
+.toast-leave-active { transition: all 0.25s ease; }
+.toast-enter-from  { opacity: 0; transform: translateX(40px); }
+.toast-leave-to    { opacity: 0; transform: translateX(40px); }
 </style>
