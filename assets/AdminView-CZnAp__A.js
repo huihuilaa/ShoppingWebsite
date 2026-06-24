@@ -1,0 +1,1 @@
+import{A as e,D as t,L as n,S as r,T as i,a,j as o}from"./index-DZWdKT4y.js";var s={class:`admin-container`},c={__name:`AdminView`,setup(c){let l=n([]);return n(``),n(0),n(``),n(``),e(async()=>{try{l.value=await a()}catch(e){console.error(`後台商品載入失敗:`,e)}}),(e,n)=>(o(),i(`div`,s,[...n[0]||=[r(`h2`,null,`管理員後台面板`,-1),t(` ... `,-1)]]))}};export{c as default};
