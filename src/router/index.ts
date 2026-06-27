@@ -60,7 +60,16 @@ const routes = [
   name: 'order-success',
   component: () => import('../views/OrderSuccessView.vue'),
   meta: { requiresAuth: true }
-  }
+  },
+  { 
+  path: '/404', 
+  name: 'not-found', 
+  component: () => import('../views/NotFoundView.vue') 
+  },
+  { 
+    path: '/:pathMatch(.*)*', 
+    redirect: '/404' 
+  },
 ];
 
 const router = createRouter({
@@ -71,6 +80,10 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const currentUser = await waitForAuth();
+
+  if (to.name === 'detail' && !to.params.id) {
+    return { name: 'not-found' };
+  }
 
   if (to.meta.requiresAuth && !currentUser) {
     return { name: 'login', query: { redirect: to.fullPath } };

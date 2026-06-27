@@ -66,7 +66,8 @@ const buyNow = async () => {
   </div>
 
   <div v-else-if="error" class="error-state">
-    <h3>抱歉，該商品不存在或已下架。</h3>
+    <h2>404</h2>
+    <p>找不到此商品，可能已下架或網址錯誤。</p>
     <RouterLink to="/" class="back-home-btn">返回首頁</RouterLink>
   </div>
 
