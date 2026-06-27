@@ -5,6 +5,12 @@
     <link rel="icon" href="/ShoppingWebsite/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIMEHINA SHOP</title>
+    <script>
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      if (redirect) {
+        window.history.replaceState(null, '', '/ShoppingWebsite' + redirect);
+      }
+    </script>
     <script type="module" crossorigin src="/ShoppingWebsite/assets/index-B0cjkxtC.js"></script>
     <link rel="stylesheet" crossorigin href="/ShoppingWebsite/assets/index-BGen64A6.css">
   </head>
